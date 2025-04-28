@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <script>
     function calculateAge(birth, measure) {
       const birthDate = new Date(birth);
@@ -105,7 +106,7 @@
     <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
     <table>
       <tbody>
-        <tr><th>이름</th><td>서준형</td></tr>
+        <tr><th>이름</th><td>홍길동</td></tr>
         <tr><th>성별</th><td>남성</td></tr>
         <tr><th>생년월일</th><td>2015-05-01 <span id="ageDisplay" class="text-gray-500"></span></td></tr>
         <tr><th>측정일</th><td>2025-04-27</td></tr>
@@ -330,6 +331,12 @@
     참고 기준 보기
   </button>
 </div>
+  
+<div class="text-center my-6">
+  <button onclick="downloadPDF()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full text-sm">
+    PDF 저장하기
+  </button>
+</div>
 
 <!-- 상담문의, 링크트리 -->
 <div class="text-center text-xs text-gray-500 mt-10 mb-4">
@@ -407,6 +414,7 @@
     </div>
   </div>
 </div>
+  
 <script>
   // 카드 열고 닫기 (항목별 세부 평가)
   function toggleCard(id) {
@@ -463,6 +471,24 @@ function activateTab(tab) {
   } else {
     buttons[1].classList.add('active-tab');
   }
+}
+</script>
+  <script>
+function downloadPDF() {
+  const name = document.querySelector('td').innerText; // 이름 td 가져오기
+  const date = document.querySelectorAll('td')[3].innerText.replace(/-/g, ''); // 측정일자 td 가져오기
+  const fileName = `${name}_${date}_kokeni.pdf`;
+
+  const element = document.body; // 전체 페이지 저장
+  const opt = {
+    margin:       0.5,
+    filename:     fileName,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().from(element).set(opt).save();
 }
 </script>
 </body>
