@@ -473,13 +473,25 @@ function activateTab(tab) {
   }
 }
 </script>
-  <script>
+<script>
 function downloadPDF() {
-  const name = document.querySelector('td').innerText; // 이름 td 가져오기
-  const date = document.querySelectorAll('td')[3].innerText.replace(/-/g, ''); // 측정일자 td 가져오기
+  const name = document.querySelector('td').innerText;
+  const date = document.querySelectorAll('td')[3].innerText.replace(/-/g, '');
   const fileName = `${name}_${date}_kokeni.pdf`;
 
-  const element = document.body; // 전체 페이지 저장
+  // 1. 모든 숨겨진 카드 열기
+  const detailCards = document.querySelectorAll('[id$="Card"]');
+  detailCards.forEach(card => {
+    card.classList.remove('max-h-0');
+    card.classList.add('max-h-[1000px]');
+  });
+
+  // 2. 모든 모달창 숨기기 (모달은 저장할 필요 없으니까 닫음)
+  document.getElementById('methodModal')?.classList.add('hidden');
+  document.getElementById('referenceModal')?.classList.add('hidden');
+
+  // 3. PDF 저장
+  const element = document.body;
   const opt = {
     margin:       0.5,
     filename:     fileName,
@@ -488,7 +500,13 @@ function downloadPDF() {
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
 
-  html2pdf().from(element).set(opt).save();
+  html2pdf().from(element).set(opt).save().then(() => {
+    // 4. 저장 완료 후 카드 다시 닫기
+    detailCards.forEach(card => {
+      card.classList.add('max-h-0');
+      card.classList.remove('max-h-[1000px]');
+    });
+  });
 }
 </script>
 </body>
