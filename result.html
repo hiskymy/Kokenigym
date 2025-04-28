@@ -1,22 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>코크니짐 체력측정 결과지</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
-    .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); max-width: 600px; margin: auto; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; table-layout: fixed; }
-    th, td { padding: 0.5rem; text-align: left; font-size: 0.875rem; word-break: keep-all; }
-    th { background: #EFF6FF; color: #1E40AF; width: 40%; }
-    td { background: #FFFFFF; width: 60%; }
-    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
+    .glass-card {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.5);
+      max-width: 600px;
+      margin: auto;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 1rem;
+    }
+    .title-gradient {
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .score-bar { position: relative; width: 100%; height: 2rem; background: #f3f4f6; border-radius: 9999px; overflow: visible; margin-top: 1rem; }
+    .score-seg { position: absolute; top: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 500; color: #fff; }
+    .threshold-label { position: absolute; top: -1.5rem; font-size: 0.75rem; font-weight: 600; color: #9ca3af; transform: translateX(-50%); }
+    .marker-line { position: absolute; bottom: 0; width: 2px; height: 100%; background: #1f1f1f; transform: translateX(-50%); }
+    .marker-arrow { position: absolute; bottom: -0.5rem; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #1f1f1f; transform: translateX(-50%); }
+    .marker-value { position: absolute; bottom: -2rem; font-size: 0.875rem; font-weight: 700; transform: translateX(-50%); color: #1f1f1f; }
     .tab-button {
       padding: 0.5rem 1rem;
       font-size: 0.875rem;
@@ -27,133 +42,186 @@
       color: #3b82f6;
       transition: 0.2s;
     }
-    .tab-button:hover {
-      background-color: #3b82f6;
-      color: white;
-    }
-    .active-tab {
-      background-color: #3b82f6;
-      color: white;
-    }
+    .tab-button:hover { background-color: #3b82f6; color: white; }
+    .active-tab { background-color: #3b82f6; color: white; }
   </style>
 </head>
-
 <body>
 
   <h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 결과지</h1>
 
-  <div id="captureArea">
-
-    <!-- 기본 정보 -->
-    <div class="glass-card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
-      <table>
-        <tbody>
-          <tr><th>이름</th><td id="name">홍길동</td></tr>
-          <tr><th>성별</th><td id="gender">남성</td></tr>
-          <tr><th>생년월일</th><td id="birth">2015-05-01</td></tr>
-          <tr><th>측정일</th><td id="measureDate">2025-04-27</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 신체조성 평가 -->
-    <div class="glass-card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-4">신체조성 평가</h2>
-      <table>
-        <tbody>
-          <tr><th>신장(cm)</th><td id="height">135</td></tr>
-          <tr><th>체중(kg)</th><td id="weight">32</td></tr>
-        </tbody>
-      </table>
-      <div class="text-xs text-right text-gray-500 mt-1">
-        대한민국 9세 남아 평균 신장 130cm / 평균 체중 30kg<br>출처: 대한소아청소년과학회 2024 성장통계
-      </div>
-
-      <!-- BMI 그래프 -->
-      <h3 class="text-md font-semibold text-indigo-600 mt-6 mb-2">BMI 평가</h3>
-      <div class="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
-        <div class="absolute left-0 top-0 h-full bg-blue-400" style="width:25%;"></div>
-        <div class="absolute left-25% top-0 h-full bg-green-400" style="width:20%;"></div>
-        <div class="absolute left-45% top-0 h-full bg-yellow-400" style="width:20%;"></div>
-        <div class="absolute left-65% top-0 h-full bg-orange-400" style="width:35%;"></div>
-        <div class="absolute top-[-20px] left-25%">18.5</div>
-        <div class="absolute top-[-20px] left-45%">23</div>
-        <div class="absolute top-[-20px] left-65%">25</div>
-        <div class="absolute top-full left-[43%] text-xs font-bold text-black">BMI 17.5</div>
-      </div>
-    </div>
-
-    <!-- 체력 측정 종합 (Radar Chart) -->
-    <div class="glass-card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-4">체력 측정 종합</h2>
-      <canvas id="radarChart"></canvas>
-    </div>
-
-    <!-- 항목별 세부 평가 (카드) -->
-    <div class="glass-card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-4">항목별 세부 평가</h2>
-
-      <!-- 예시 카드 -->
-      <div class="p-4 bg-white rounded-lg shadow mb-4">
-        <h3 class="text-lg font-bold mb-2">유연성</h3>
-        <div class="w-full bg-gray-200 rounded-full h-4 relative mb-2">
-          <div class="bg-blue-400 h-full rounded-full" style="width:70%;"></div>
-          <span class="absolute inset-0 text-xs font-bold text-white flex justify-center items-center">70점</span>
-        </div>
-        <p class="text-sm text-gray-700 mb-2">좌전굴 테스트로 평가되었습니다. 꾸준한 스트레칭을 권장합니다.</p>
-        <button onclick="openMethodModal('좌전굴', '좌전굴은 앉은 자세에서 손끝을 앞으로 뻗어 유연성을 측정합니다.')" class="text-xs text-blue-500 underline">측정 방법 보기</button>
-      </div>
-
-    </div>
-
-    <!-- 상담문의 및 링크트리 -->
-    <div class="text-center text-xs text-gray-500 mt-10 mb-4">
-      상담문의 : 010-5380-5840<br>
-      <a href="https://linktr.ee/Kokenigym" target="_blank" class="underline text-blue-600">코크니짐 Linktree 바로가기</a>
-    </div>
-
+  <!-- 기본 정보 -->
+  <div class="glass-card text-left" id="captureArea">
+    <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
+    <table class="w-full text-sm">
+      <tbody>
+        <tr><th class="p-2">이름</th><td class="p-2" id="nameField"></td></tr>
+        <tr><th class="p-2">성별</th><td class="p-2" id="genderField"></td></tr>
+        <tr><th class="p-2">생년월일</th><td class="p-2" id="birthField"></td></tr>
+        <tr><th class="p-2">측정일</th><td class="p-2" id="measureDateField"></td></tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- PDF 저장 버튼 -->
-  <div class="fixed bottom-6 right-6">
-    <button onclick="downloadPDF()" class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-full shadow-lg">
-      PDF 저장
-    </button>
+  <!-- 신체조성 평가 -->
+  <div class="glass-card text-left">
+    <h2 class="text-lg font-bold text-indigo-700 mb-4">신체조성 평가</h2>
+    <table class="w-full text-sm">
+      <tbody>
+        <tr><th class="p-2">신장(cm)</th><td class="p-2" id="heightField"></td></tr>
+        <tr><th class="p-2">체중(kg)</th><td class="p-2" id="weightField"></td></tr>
+      </tbody>
+    </table>
+    <div class="text-xs text-right text-gray-500 mb-4">
+      대한민국 9세 남아 평균 신장 130cm / 평균 체중 30kg<br/>
+      출처: 대한소아청소년과학회 2024 성장통계
+    </div>
+
+    <h3 class="text-md font-semibold text-indigo-600 mb-2">BMI 평가</h3>
+    <div class="score-bar">
+      <div class="score-seg bg-blue-400" style="left:0; width:25%;">저체중</div>
+      <div class="score-seg bg-green-400" style="left:25%; width:20%;">정상</div>
+      <div class="score-seg bg-yellow-400" style="left:45%; width:20%;">과체중</div>
+      <div class="score-seg bg-orange-400" style="left:65%; width:35%; border-top-right-radius:9999px; border-bottom-right-radius:9999px;">비만</div>
+      <span class="threshold-label" style="left:25%;">18.5</span>
+      <span class="threshold-label" style="left:45%;">23</span>
+      <span class="threshold-label" style="left:65%;">25</span>
+      <div class="marker-line" id="bmiLine"></div>
+      <div class="marker-arrow" id="bmiArrow"></div>
+      <span class="marker-value" id="bmiValue"></span>
+    </div>
   </div>
 
-  <!-- 측정 방법 모달 -->
-  <div id="methodModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-80">
-      <h3 id="methodTitle" class="text-lg font-bold mb-4 text-center text-indigo-700"></h3>
-      <p id="methodDesc" class="text-sm text-gray-700 text-center"></p>
+  <!-- 체력 측정 종합 -->
+  <div class="glass-card">
+    <h2 class="text-lg font-bold text-indigo-700 mb-4">체력 측정 종합</h2>
+    <canvas id="radarChart"></canvas>
+  </div>
+
+  <!-- 항목별 세부 평가 -->
+  <div class="glass-card">
+    <h2 class="text-lg font-bold text-indigo-700 text-center mb-4">항목별 세부 평가</h2>
+    <div id="cardsContainer"></div>
+  </div>
+
+  <!-- 버튼들 -->
+  <div class="text-center my-6 space-x-4">
+    <button onclick="openReferenceModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full">참고 기준 보기</button>
+    <button onclick="downloadPDF()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full">PDF 저장하기</button>
+  </div>
+
+  <!-- 참고 기준 모달 -->
+  <div id="referenceModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+    <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
+      <h3 class="text-lg font-bold text-indigo-700 mb-4 text-center">참고 기준표</h3>
+      <div class="flex justify-center mb-4 space-x-2">
+        <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세</button>
+        <button onclick="showPAPSStandard()" class="tab-button">12세 이상</button>
+      </div>
+      <div id="youthStandard">
+        <!-- youth table -->
+      </div>
+      <div id="papsStandard" class="hidden">
+        <!-- paps table -->
+      </div>
       <div class="text-center mt-6">
-        <button onclick="closeMethodModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-1 px-4 rounded-full text-sm">닫기</button>
+        <button onclick="closeReferenceModal()" class="bg-gray-400 hover:bg-gray-500 text-white py-1 px-4 rounded-full">닫기</button>
       </div>
     </div>
   </div>
 
-  <script>
-    function downloadPDF() {
-      const element = document.getElementById('captureArea');
-      html2pdf().from(element).set({
-        margin: 0.5,
-        filename: '홍길동_20250427_Kokeni.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      }).save();
-    }
+<script>
+  // URL 파라미터 읽기
+  function getParam(name) {
+    return new URLSearchParams(location.search).get(name) || '';
+  }
+  function calculateAge(birth, measure) {
+    const b = new Date(birth), m = new Date(measure);
+    let age = m.getFullYear() - b.getFullYear();
+    if (m.getMonth()<b.getMonth() || (m.getMonth()===b.getMonth() && m.getDate()<b.getDate())) age--;
+    return age;
+  }
 
-    function openMethodModal(title, desc) {
-      document.getElementById('methodTitle').innerText = title;
-      document.getElementById('methodDesc').innerText = desc;
-      document.getElementById('methodModal').classList.remove('hidden');
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    // 기본 정보
+    const name = getParam('name'),
+          gender = getParam('gender'),
+          birth = getParam('birth'),
+          measureDate = getParam('measureDate'),
+          height = +getParam('height'),
+          weight = +getParam('weight');
+    document.getElementById('nameField').innerText = name;
+    document.getElementById('genderField').innerText = gender;
+    document.getElementById('birthField').innerText = birth + ' (만 '+calculateAge(birth, measureDate)+'세)';
+    document.getElementById('measureDateField').innerText = measureDate;
+    document.getElementById('heightField').innerText = height;
+    document.getElementById('weightField').innerText = weight;
 
-    function closeMethodModal() {
-      document.getElementById('methodModal').classList.add('hidden');
-    }
-  </script>
+    // BMI 계산 및 표시
+    const bmi = (weight / ((height/100)*(height/100))).toFixed(1);
+    const pct = Math.min(Math.max((bmi/40)*100, 0), 100);
+    document.getElementById('bmiValue').innerText = bmi;
+    const line = document.getElementById('bmiLine'),
+          arrow = document.getElementById('bmiArrow');
+    line.style.left = `${pct}%`;
+    arrow.style.left = `${pct}%`;
+
+    // 항목별 카드 생성
+    const labels = ['유연성','근력','순발력','민첩성','평형성','협응성'];
+    const scores = [
+      +getParam('flexibility'),
+      +getParam('strength'),
+      +getParam('power'),
+      +getParam('agility'),
+      +getParam('balance'),
+      +getParam('coordination')
+    ];
+    const container = document.getElementById('cardsContainer');
+    labels.forEach((lbl,i)=> {
+      const score = scores[i];
+      const card = document.createElement('div');
+      card.className='p-4 bg-white rounded-lg shadow mb-4';
+      card.innerHTML=`
+        <h3 class="text-lg font-bold mb-1">${lbl}</h3>
+        <div class="relative w-full h-4 bg-gray-200 rounded-full mb-2">
+          <div class="absolute top-0 left-0 h-full bg-indigo-500" style="width:${score}%;"></div>
+          <span class="absolute inset-0 text-xs font-bold text-white flex justify-center items-center">${score}점</span>
+        </div>`;
+      container.append(card);
+    });
+
+    // 레이더 차트
+    new Chart(document.getElementById('radarChart'), {
+      type:'radar',
+      data:{ labels, datasets:[
+        { label:'점수', data:scores, fill:true, backgroundColor:'rgba(59,130,246,0.2)', borderColor:'rgba(59,130,246,1)' }
+      ]},
+      options:{ scales:{ r:{ suggestedMin:0,suggestedMax:100 } } }
+    });
+  });
+
+  // 모달 제어
+  function openReferenceModal(){ document.getElementById('referenceModal').classList.remove('hidden'); }
+  function closeReferenceModal(){ document.getElementById('referenceModal').classList.add('hidden'); }
+  function showYouthStandard(){
+    document.getElementById('youthStandard').classList.remove('hidden');
+    document.getElementById('papsStandard').classList.add('hidden');
+    document.querySelectorAll('.tab-button').forEach((b,i)=>b.classList.toggle('active-tab', i===0));
+  }
+  function showPAPSStandard(){
+    document.getElementById('youthStandard').classList.add('hidden');
+    document.getElementById('papsStandard').classList.remove('hidden');
+    document.querySelectorAll('.tab-button').forEach((b,i)=>b.classList.toggle('active-tab', i===1));
+  }
+
+  // PDF 저장
+  function downloadPDF(){
+    html2pdf().from(document.getElementById('captureArea')).set({
+      margin:0.5, filename:`${getParam('name')}_${getParam('measureDate')}_kokeni.pdf`,
+      image:{quality:1}, html2canvas:{scale:3}, jsPDF:{unit:'mm',format:'a4'}
+    }).save();
+  }
+</script>
 
 </body>
 </html>
