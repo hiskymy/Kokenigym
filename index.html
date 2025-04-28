@@ -74,7 +74,27 @@
     .marker-line { position: absolute; bottom: 0; height: 100%; width: 2px; background: #1f1f1f; transform: translateX(-50%); }
     .marker-arrow { position: absolute; bottom: -0.5rem; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #1f1f1f; transform: translateX(-50%); }
     .marker-value { position: absolute; bottom: -2rem; font-size: 0.875rem; font-weight: 700; transform: translateX(-50%); color: #1f1f1f; }
-    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
+    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }  
+  .tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid #3b82f6;
+    border-radius: 9999px;
+    background-color: white;
+    color: #3b82f6;
+    transition: 0.2s;
+  }
+  .tab-button:hover {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+  .active-tab {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
   </style>
 </head>
 <body>
@@ -85,9 +105,9 @@
     <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
     <table>
       <tbody>
-        <tr><th>이름</th><td>서준형</td></tr>
+        <tr><th>이름</th><td>홍길동</td></tr>
         <tr><th>성별</th><td>남성</td></tr>
-        <tr><th>생년월일</th><td>2015-05-05 <span id="ageDisplay" class="text-gray-500"></span></td></tr>
+        <tr><th>생년월일</th><td>2015-05-01 <span id="ageDisplay" class="text-gray-500"></span></td></tr>
         <tr><th>측정일</th><td>2025-04-27</td></tr>
       </tbody>
     </table>
@@ -318,79 +338,70 @@
 </div>
 
 
-<!-- 참고 기준 모달 (항목별 상세 기준) -->
-<div id="modal" class="modal hidden fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+<!-- 참고 기준 모달 (토글 방식 최종본) -->
+<div id="referenceModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
   <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
-    <h3 class="text-lg font-bold mb-4 text-center text-indigo-700">항목별 체력 평가 기준표</h3>
-    <p class="text-xs text-gray-500 mb-4 text-center">※ 본 기준은 PAPS 체력등급 및 국내 유소년 체력 측정 표준을 참고하여 작성되었습니다.</p>
-    
-    <div class="overflow-x-auto">
-      <table class="w-full text-xs table-auto border">
-        <thead class="bg-gray-100 text-gray-700">
-          <tr>
-            <th class="p-2 border">항목</th>
-            <th class="p-2 border">1등급</th>
-            <th class="p-2 border">2등급</th>
-            <th class="p-2 border">3등급</th>
-            <th class="p-2 border">4등급</th>
-            <th class="p-2 border">5등급</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="p-2 border">유연성 (좌전굴)</td>
-            <td class="p-2 border">15cm 이상</td>
-            <td class="p-2 border">10~14cm</td>
-            <td class="p-2 border">5~9cm</td>
-            <td class="p-2 border">1~4cm</td>
-            <td class="p-2 border">0cm 이하</td>
-          </tr>
-          <tr>
-            <td class="p-2 border">근력 (윗몸일으키기)</td>
-            <td class="p-2 border">35회 이상</td>
-            <td class="p-2 border">30~34회</td>
-            <td class="p-2 border">25~29회</td>
-            <td class="p-2 border">20~24회</td>
-            <td class="p-2 border">19회 이하</td>
-          </tr>
-          <tr>
-            <td class="p-2 border">순발력 (제자리멀리뛰기)</td>
-            <td class="p-2 border">160cm 이상</td>
-            <td class="p-2 border">150~159cm</td>
-            <td class="p-2 border">140~149cm</td>
-            <td class="p-2 border">130~139cm</td>
-            <td class="p-2 border">129cm 이하</td>
-          </tr>
-          <tr>
-            <td class="p-2 border">민첩성 (왕복달리기)</td>
-            <td class="p-2 border">10초 이하</td>
-            <td class="p-2 border">10.1~11초</td>
-            <td class="p-2 border">11.1~12초</td>
-            <td class="p-2 border">12.1~13초</td>
-            <td class="p-2 border">13.1초 이상</td>
-          </tr>
-          <tr>
-            <td class="p-2 border">평형성 (한발서기)</td>
-            <td class="p-2 border">60초 이상</td>
-            <td class="p-2 border">45~59초</td>
-            <td class="p-2 border">30~44초</td>
-            <td class="p-2 border">15~29초</td>
-            <td class="p-2 border">14초 이하</td>
-          </tr>
-          <tr>
-            <td class="p-2 border">협응성 (공잡기)</td>
-            <td class="p-2 border">60회 이상</td>
-            <td class="p-2 border">50~59회</td>
-            <td class="p-2 border">40~49회</td>
-            <td class="p-2 border">30~39회</td>
-            <td class="p-2 border">29회 이하</td>
-          </tr>
-        </tbody>
-      </table>
+    <h3 class="text-lg font-bold mb-6 text-center text-indigo-700">참고 기준표</h3>
+
+    <!-- 토글 버튼 -->
+    <div class="flex justify-center mb-6 space-x-2">
+      <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세 (코크니짐)</button>
+      <button onclick="showPAPSStandard()" class="tab-button">12세 이상(PAPS)</button>
     </div>
 
+    <!-- 5~11세 기준 -->
+    <div id="youthStandard">
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full text-xs table-auto border">
+          <thead class="bg-gray-100 text-gray-700">
+            <tr>
+              <th class="p-2 border">항목</th><th class="p-2 border">1등급</th><th class="p-2 border">2등급</th><th class="p-2 border">3등급</th><th class="p-2 border">4등급</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="p-2 border">유연성 (좌전굴)</td><td class="p-2 border">13cm 이상</td><td class="p-2 border">10~12cm</td><td class="p-2 border">5~9cm</td><td class="p-2 border">5cm 미만</td></tr>
+            <tr><td class="p-2 border">근력•근지구력 (Wall Sit)</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
+            <tr><td class="p-2 border">순발력 (5~7세)</td><td class="p-2 border">120cm 이상</td><td class="p-2 border">100~119cm</td><td class="p-2 border">80~99cm</td><td class="p-2 border">79cm 이하</td></tr>
+            <tr><td class="p-2 border">순발력 (8~9세)</td><td class="p-2 border">140cm 이상</td><td class="p-2 border">120~139cm</td><td class="p-2 border">100~119cm</td><td class="p-2 border">99cm 이하</td></tr>
+            <tr><td class="p-2 border">순발력 (10~11세)</td><td class="p-2 border">160cm 이상</td><td class="p-2 border">140~159cm</td><td class="p-2 border">120~139cm</td><td class="p-2 border">119cm 이하</td></tr>
+            <tr><td class="p-2 border">민첩성 (왕복달리기)</td><td class="p-2 border">4.5초 이하</td><td class="p-2 border">4.6~5.5초</td><td class="p-2 border">5.6~6.5초</td><td class="p-2 border">6.6초 이상</td></tr>
+            <tr><td class="p-2 border">평형성 (한발서기)</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
+            <tr><td class="p-2 border">협응성 (공잡기)</td><td class="p-2 border">3회</td><td class="p-2 border">2회</td><td class="p-2 border">1회</td><td class="p-2 border">0회</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-gray-500 text-center">
+        ※ 본 기준은 5~11세 아동의 발달 특성을 고려하여 코크니짐 아동 발달 연구진이 직접 연구 및 검증한 기준입니다.
+      </p>
+    </div>
+
+    <!-- 12세 이상(PAPS) 기준 -->
+    <div id="papsStandard" class="hidden">
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full text-xs table-auto border">
+          <thead class="bg-gray-100 text-gray-700">
+            <tr>
+              <th class="p-2 border">항목</th><th class="p-2 border">1등급</th><th class="p-2 border">2등급</th><th class="p-2 border">3등급</th><th class="p-2 border">4등급</th><th class="p-2 border">5등급</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="p-2 border">유연성 (좌전굴)</td><td class="p-2 border">15cm 이상</td><td class="p-2 border">10~14cm</td><td class="p-2 border">5~9cm</td><td class="p-2 border">1~4cm</td><td class="p-2 border">0cm 이하</td></tr>
+            <tr><td class="p-2 border">근력 (윗몸일으키기)</td><td class="p-2 border">35회 이상</td><td class="p-2 border">30~34회</td><td class="p-2 border">25~29회</td><td class="p-2 border">20~24회</td><td class="p-2 border">19회 이하</td></tr>
+            <tr><td class="p-2 border">순발력 (멀리뛰기)</td><td class="p-2 border">160cm 이상</td><td class="p-2 border">150~159cm</td><td class="p-2 border">140~149cm</td><td class="p-2 border">130~139cm</td><td class="p-2 border">129cm 이하</td></tr>
+            <tr><td class="p-2 border">민첩성 (50m 달리기)</td><td class="p-2 border">10초 이하</td><td class="p-2 border">10.1~11초</td><td class="p-2 border">11.1~12초</td><td class="p-2 border">12.1~13초</td><td class="p-2 border">13.1초 이상</td></tr>
+            <tr><td class="p-2 border">평형성 (한발서기)</td><td class="p-2 border">60초 이상</td><td class="p-2 border">45~59초</td><td class="p-2 border">30~44초</td><td class="p-2 border">15~29초</td><td class="p-2 border">14초 이하</td></tr>
+            <tr><td class="p-2 border">협응성 (공잡기)</td><td class="p-2 border">60회 이상</td><td class="p-2 border">50~59회</td><td class="p-2 border">40~49회</td><td class="p-2 border">30~39회</td><td class="p-2 border">29회 이하</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-gray-500 text-center">
+        ※ 본 기준은 PAPS 체력등급 및 국내 유소년 체력 표준을 참고하여 작성되었습니다.
+      </p>
+    </div>
+
+    <!-- 닫기 버튼 -->
     <div class="text-center mt-6">
-      <button onclick="closeModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded-full text-sm">
+      <button onclick="closeReferenceModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded-full text-sm">
         닫기
       </button>
     </div>
@@ -424,13 +435,35 @@
 
   // 참고 기준 모달 열기 (하단 버튼)
   function openModal() {
-    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('referenceModal').classList.remove('hidden');
   }
 
   // 참고 기준 모달 닫기
-  function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
+  function closeReferenceModal() {
+    document.getElementById('referenceModal').classList.add('hidden');
   }
+  function showYouthStandard() {
+  document.getElementById('youthStandard').classList.remove('hidden');
+  document.getElementById('papsStandard').classList.add('hidden');
+  activateTab('youth');
+}
+
+function showPAPSStandard() {
+  document.getElementById('papsStandard').classList.remove('hidden');
+  document.getElementById('youthStandard').classList.add('hidden');
+  activateTab('paps');
+}
+
+function activateTab(tab) {
+  const buttons = document.querySelectorAll('.tab-button');
+  buttons.forEach(btn => btn.classList.remove('active-tab'));
+  
+  if (tab === 'youth') {
+    buttons[0].classList.add('active-tab');
+  } else {
+    buttons[1].classList.add('active-tab');
+  }
+}
 </script>
 </body>
 </html>
