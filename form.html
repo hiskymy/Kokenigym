@@ -2,113 +2,79 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>코크니짐 체력측정 입력</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코크니짐 체력측정 입력폼</title>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body { font-family: 'Pretendard', sans-serif; background: #DBEAFE; }
-    .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 1rem; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-    .form-label { font-weight: 600; color: #1E3A8A; }
+    body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
+    .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4); max-width: 600px; margin: auto; padding: 1.5rem; border-radius: 1rem; }
+    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
 
-  <div class="glass-card w-full max-w-lg space-y-6">
-    <h1 class="text-2xl font-bold text-center text-indigo-700">코크니짐 체력측정 입력</h1>
+<body>
 
-    <form id="inputForm" class="space-y-4">
-      <!-- 기본 정보 -->
+  <h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 입력</h1>
+
+  <div class="glass-card">
+    <form id="measureForm" class="space-y-6">
+      
       <div>
-        <label class="form-label">이름</label>
-        <input type="text" id="name" required class="w-full mt-1 p-2 border rounded">
+        <label class="block mb-1 font-bold">이름</label>
+        <input type="text" name="name" class="w-full border rounded p-2" required>
       </div>
+
       <div>
-        <label class="form-label">성별</label>
-        <select id="gender" required class="w-full mt-1 p-2 border rounded">
+        <label class="block mb-1 font-bold">성별</label>
+        <select name="gender" class="w-full border rounded p-2" required>
+          <option value="">선택</option>
           <option value="남성">남성</option>
           <option value="여성">여성</option>
         </select>
       </div>
+
       <div>
-        <label class="form-label">생년월일</label>
-        <input type="date" id="birth" required class="w-full mt-1 p-2 border rounded">
+        <label class="block mb-1 font-bold">생년월일</label>
+        <input type="date" name="birth" class="w-full border rounded p-2" required>
       </div>
+
       <div>
-        <label class="form-label">측정일</label>
-        <input type="date" id="measureDate" required class="w-full mt-1 p-2 border rounded" value="">
+        <label class="block mb-1 font-bold">측정일</label>
+        <input type="date" name="measureDate" class="w-full border rounded p-2" required>
       </div>
 
-      <!-- 신체 조성 -->
-      <div class="pt-4 border-t">
-        <label class="form-label">신장(cm)</label>
-        <input type="number" id="height" required class="w-full mt-1 p-2 border rounded">
-      </div>
       <div>
-        <label class="form-label">체중(kg)</label>
-        <input type="number" id="weight" required class="w-full mt-1 p-2 border rounded">
+        <label class="block mb-1 font-bold">신장(cm)</label>
+        <input type="number" name="height" class="w-full border rounded p-2" required>
       </div>
 
-      <!-- 6가지 측정 항목 -->
-      <div class="pt-4 border-t space-y-2">
-        <h2 class="text-lg font-bold text-indigo-700">측정값 입력</h2>
-
-        <div>
-          <label class="form-label">유연성 (좌전굴 cm)</label>
-          <input type="number" id="flexibility" required class="w-full mt-1 p-2 border rounded">
-        </div>
-        <div>
-          <label class="form-label">근력/근지구력 (Wall Sit 초)</label>
-          <input type="number" id="strength" required class="w-full mt-1 p-2 border rounded">
-        </div>
-        <div>
-          <label class="form-label">순발력 (제자리멀리뛰기 cm)</label>
-          <input type="number" id="power" required class="w-full mt-1 p-2 border rounded">
-        </div>
-        <div>
-          <label class="form-label">민첩성 (왕복달리기 초)</label>
-          <input type="number" id="agility" required class="w-full mt-1 p-2 border rounded">
-        </div>
-        <div>
-          <label class="form-label">평형성 (한발서기 초)</label>
-          <input type="number" id="balance" required class="w-full mt-1 p-2 border rounded">
-        </div>
-        <div>
-          <label class="form-label">협응성 (공잡기 횟수)</label>
-          <input type="number" id="coordination" required class="w-full mt-1 p-2 border rounded">
-        </div>
+      <div>
+        <label class="block mb-1 font-bold">체중(kg)</label>
+        <input type="number" name="weight" class="w-full border rounded p-2" required>
       </div>
 
-      <div class="pt-6">
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+      <div class="text-center">
+        <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full">
           결과지 생성
         </button>
       </div>
+
     </form>
   </div>
 
-<script>
-document.getElementById('inputForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const params = new URLSearchParams({
-    name: document.getElementById('name').value,
-    gender: document.getElementById('gender').value,
-    birth: document.getElementById('birth').value,
-    measureDate: document.getElementById('measureDate').value,
-    height: document.getElementById('height').value,
-    weight: document.getElementById('weight').value,
-    flexibility: document.getElementById('flexibility').value,
-    strength: document.getElementById('strength').value,
-    power: document.getElementById('power').value,
-    agility: document.getElementById('agility').value,
-    balance: document.getElementById('balance').value,
-    coordination: document.getElementById('coordination').value
-  });
-
-  window.location.href = `result.html?${params.toString()}`;
-});
-</script>
+  <script>
+    document.getElementById('measureForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        params.append(key, value);
+      }
+      window.location.href = `result.html?${params.toString()}`;
+    });
+  </script>
 
 </body>
 </html>
