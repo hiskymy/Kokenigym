@@ -1,66 +1,113 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>코크니짐 체력측정 입력폼</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
-    .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4); max-width: 600px; margin: auto; padding: 1.5rem; border-radius: 1rem; }
-    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
+    .glass-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.4);
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 1rem;
+    }
+    .form-label { font-weight: 600; color: #1E3A8A; }
   </style>
 </head>
-
 <body>
 
-  <h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 입력</h1>
+  <h1 class="text-3xl font-extrabold text-center text-indigo-700 mb-8">코크니짐 체력측정 입력</h1>
 
   <div class="glass-card">
     <form id="measureForm" class="space-y-6">
-      
+      <!-- 기본 정보 -->
       <div>
-        <label class="block mb-1 font-bold">이름</label>
-        <input type="text" name="name" class="w-full border rounded p-2" required>
+        <label class="form-label block mb-1">이름</label>
+        <input type="text" name="name" required
+               class="w-full p-2 border rounded" />
       </div>
-
       <div>
-        <label class="block mb-1 font-bold">성별</label>
-        <select name="gender" class="w-full border rounded p-2" required>
+        <label class="form-label block mb-1">성별</label>
+        <select name="gender" required
+                class="w-full p-2 border rounded">
           <option value="">선택</option>
           <option value="남성">남성</option>
           <option value="여성">여성</option>
         </select>
       </div>
-
       <div>
-        <label class="block mb-1 font-bold">생년월일</label>
-        <input type="date" name="birth" class="w-full border rounded p-2" required>
+        <label class="form-label block mb-1">생년월일</label>
+        <input type="date" name="birth" required
+               class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="form-label block mb-1">측정일</label>
+        <input type="date" name="measureDate" required
+               class="w-full p-2 border rounded" />
       </div>
 
+      <!-- 신체 조성 -->
       <div>
-        <label class="block mb-1 font-bold">측정일</label>
-        <input type="date" name="measureDate" class="w-full border rounded p-2" required>
+        <label class="form-label block mb-1">신장(cm)</label>
+        <input type="number" name="height" required
+               class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="form-label block mb-1">체중(kg)</label>
+        <input type="number" name="weight" required
+               class="w-full p-2 border rounded" />
       </div>
 
+      <!-- 측정 점수 -->
       <div>
-        <label class="block mb-1 font-bold">신장(cm)</label>
-        <input type="number" name="height" class="w-full border rounded p-2" required>
+        <h2 class="text-xl font-bold text-indigo-700 mb-2">측정 점수 입력</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="form-label block mb-1">유연성 (점수)</label>
+            <input type="number" name="flexibility" required
+                   class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="form-label block mb-1">근력/근지구력 (점수)</label>
+            <input type="number" name="strength" required
+                   class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="form-label block mb-1">순발력 (점수)</label>
+            <input type="number" name="power" required
+                   class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="form-label block mb-1">민첩성 (점수)</label>
+            <input type="number" name="agility" required
+                   class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="form-label block mb-1">평형성 (점수)</label>
+            <input type="number" name="balance" required
+                   class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="form-label block mb-1">협응성 (점수)</label>
+            <input type="number" name="coordination" required
+                   class="w-full p-2 border rounded" />
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label class="block mb-1 font-bold">체중(kg)</label>
-        <input type="number" name="weight" class="w-full border rounded p-2" required>
-      </div>
-
-      <div class="text-center">
-        <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full">
+      <div class="text-center mt-6">
+        <button type="submit"
+                class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full">
           결과지 생성
         </button>
       </div>
-
     </form>
   </div>
 
@@ -72,6 +119,7 @@
       for (const [key, value] of formData.entries()) {
         params.append(key, value);
       }
+      // 결과 페이지로 이동
       window.location.href = `result.html?${params.toString()}`;
     });
   </script>
