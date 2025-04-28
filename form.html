@@ -1,128 +1,17 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>코크니짐 체력측정 입력폼</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
-    .glass-card {
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      border: 1px solid rgba(255,255,255,0.4);
-      max-width: 600px;
-      margin: auto;
-      padding: 2rem;
-      border-radius: 1rem;
-    }
-    .form-label { font-weight: 600; color: #1E3A8A; }
-  </style>
-</head>
-<body>
+코크니짐 체력측정 입력폼 body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; } .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-radius: 1rem; padding:2rem; max-width:600px; margin:auto; } .hidden { display: none; } 코크니짐 체력측정 입력 
 
-  <h1 class="text-3xl font-extrabold text-center text-indigo-700 mb-8">코크니짐 체력측정 입력</h1>
+이름
 
-  <div class="glass-card">
-    <form id="measureForm" class="space-y-6">
-      <!-- 기본 정보 -->
-      <div>
-        <label class="form-label block mb-1">이름</label>
-        <input type="text" name="name" required
-               class="w-full p-2 border rounded" />
-      </div>
-      <div>
-        <label class="form-label block mb-1">성별</label>
-        <select name="gender" required
-                class="w-full p-2 border rounded">
-          <option value="">선택</option>
-          <option value="남성">남성</option>
-          <option value="여성">여성</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label block mb-1">생년월일</label>
-        <input type="date" name="birth" required
-               class="w-full p-2 border rounded" />
-      </div>
-      <div>
-        <label class="form-label block mb-1">측정일</label>
-        <input type="date" name="measureDate" required
-               class="w-full p-2 border rounded" />
-      </div>
+성별선택남성여성
 
-      <!-- 신체 조성 -->
-      <div>
-        <label class="form-label block mb-1">신장(cm)</label>
-        <input type="number" name="height" required
-               class="w-full p-2 border rounded" />
-      </div>
-      <div>
-        <label class="form-label block mb-1">체중(kg)</label>
-        <input type="number" name="weight" required
-               class="w-full p-2 border rounded" />
-      </div>
+생년월일
 
-      <!-- 측정 점수 -->
-      <div>
-        <h2 class="text-xl font-bold text-indigo-700 mb-2">측정 점수 입력</h2>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="form-label block mb-1">유연성 (점수)</label>
-            <input type="number" name="flexibility" required
-                   class="w-full p-2 border rounded" />
-          </div>
-          <div>
-            <label class="form-label block mb-1">근력/근지구력 (점수)</label>
-            <input type="number" name="strength" required
-                   class="w-full p-2 border rounded" />
-          </div>
-          <div>
-            <label class="form-label block mb-1">순발력 (점수)</label>
-            <input type="number" name="power" required
-                   class="w-full p-2 border rounded" />
-          </div>
-          <div>
-            <label class="form-label block mb-1">민첩성 (점수)</label>
-            <input type="number" name="agility" required
-                   class="w-full p-2 border rounded" />
-          </div>
-          <div>
-            <label class="form-label block mb-1">평형성 (점수)</label>
-            <input type="number" name="balance" required
-                   class="w-full p-2 border rounded" />
-          </div>
-          <div>
-            <label class="form-label block mb-1">협응성 (점수)</label>
-            <input type="number" name="coordination" required
-                   class="w-full p-2 border rounded" />
-          </div>
-        </div>
-      </div>
+측정일
 
-      <div class="text-center mt-6">
-        <button type="submit"
-                class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full">
-          결과지 생성
-        </button>
-      </div>
-    </form>
-  </div>
+신장(cm)
 
-  <script>
-    document.getElementById('measureForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const params = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        params.append(key, value);
-      }
-      // 결과 페이지로 이동
-      window.location.href = `result.html?${params.toString()}`;
-    });
-  </script>
+체중(kg)
 
-</body>
-</html>
+<!-- 측정값 --> <h2 class="text-xl font-bold text-indigo-700">측정값 입력</h2> <!-- 유연성 --> <div> <label class="block mb-1 font-semibold">유연성 (cm)</label> <div class="flex items-center space-x-2"> <input type="number" name="flex1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="flexToggle"/> 2회 측정</label> </div> <input type="number" name="flex2" id="flex2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <!-- 근력 --> <div> <label class="block mb-1 font-semibold">근력/근지구력 (초)</label> <div class="flex items-center space-x-2"> <input type="number" name="strength1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="strengthToggle"/> 2회 측정</label> </div> <input type="number" name="strength2" id="strength2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <!-- 순발력 --> <div> <label class="block mb-1 font-semibold">순발력 (cm)</label> <div class="flex items-center space-x-2"> <input type="number" name="power1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="powerToggle"/> 2회 측정</label> </div> <input type="number" name="power2" id="power2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <!-- 민첩성 --> <div> <label class="block mb-1 font-semibold">민첩성 (초)</label> <div class="flex items-center space-x-2"> <input type="number" name="agility1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="agilityToggle"/> 2회 측정</label> </div> <input type="number" name="agility2" id="agility2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <!-- 평형성 --> <div> <label class="block mb-1 font-semibold">평형성 (초)</label> <div class="flex items-center space-x-2"> <input type="number" name="balance1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="balanceToggle"/> 2회 측정</label> </div> <input type="number" name="balance2" id="balance2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <!-- 협응성 --> <div> <label class="block mb-1 font-semibold">협응성 (회)</label> <div class="flex items-center space-x-2"> <input type="number" name="coordination1" placeholder="1회" class="w-1/2 p-2 border rounded"/> <label class="flex items-center"><input type="checkbox" id="coordinationToggle"/> 2회 측정</label> </div> <input type="number" name="coordination2" id="coordination2" placeholder="2회" class="hidden mt-2 w-full p-2 border rounded"/> </div> <div class="text-center"> <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded-full">결과지 생성</button> </div> </form> 
+
+// 토글 처리 ['flex','strength','power','agility','balance','coordination'].forEach(key=>{ document.getElementById(key+'Toggle').addEventListener('change', e=>{ document.getElementById(key+'2').classList.toggle('hidden', !e.target.checked); }); }); // 전송 전 검증 및 확인 document.getElementById('measureForm').addEventListener('submit', function(e){ e.preventDefault(); const fm=new FormData(this); const missing=[]; // 필수 항목 ['name','gender','birth','measureDate','height','weight'].forEach(k=>{ if(!fm.get(k)) missing.push(k); }); // 1회 값 ['flex','strength','power','agility','balance','coordination'].forEach(k=>{ if(!fm.get(k+'1')) missing.push(k+' 1회'); }); if(missing.length){ alert('다음 항목을 입력해주세요:\n'+missing.join('\n')); return; } // 2회 값: 하나라도 있으면 나머지는 1회 값으로 채움 const any2=['flex','strength','power','agility','balance','coordination'].some(k=>fm.get(k+'2')); const data={}; fm.forEach((v,k)=> data[k]=v); if(any2){ ['flex','strength','power','agility','balance','coordination'].forEach(k=>{ if(!data[k+'2']) data[k+'2']=data[k+'1']; }); } // 확인 팝업 let msg='입력하신 값을 확인하세요:\n'; Object.entries(data).forEach(([k,v])=> msg+=`${k}: ${v}\n`); if(!confirm(msg+'\n이대로 생성하시겠습니까?')) return; // URL 파라미터로 전달 const params=new URLSearchParams(data); location.href='result.html?'+params.toString(); }); 
