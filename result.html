@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코크니짐 체력측정 결과지</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
+    .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); max-width: 600px; margin: auto; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; table-layout: fixed; }
+    th, td { padding: 0.5rem; text-align: left; font-size: 0.875rem; word-break: keep-all; }
+    th { background: #EFF6FF; color: #1E40AF; width: 40%; }
+    td { background: #FFFFFF; width: 60%; }
+    .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
+    .tab-button {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid #3b82f6;
+      border-radius: 9999px;
+      background-color: white;
+      color: #3b82f6;
+      transition: 0.2s;
+    }
+    .tab-button:hover {
+      background-color: #3b82f6;
+      color: white;
+    }
+    .active-tab {
+      background-color: #3b82f6;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 결과지</h1>
+
+  <div id="captureArea">
+
+    <!-- 기본 정보 -->
+    <div class="glass-card">
+      <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
+      <table>
+        <tbody>
+          <tr><th>이름</th><td id="name">홍길동</td></tr>
+          <tr><th>성별</th><td id="gender">남성</td></tr>
+          <tr><th>생년월일</th><td id="birth">2015-05-01</td></tr>
+          <tr><th>측정일</th><td id="measureDate">2025-04-27</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 신체조성 평가 -->
+    <div class="glass-card">
+      <h2 class="text-lg font-bold text-indigo-700 mb-4">신체조성 평가</h2>
+      <table>
+        <tbody>
+          <tr><th>신장(cm)</th><td id="height">135</td></tr>
+          <tr><th>체중(kg)</th><td id="weight">32</td></tr>
+        </tbody>
+      </table>
+      <div class="text-xs text-right text-gray-500 mt-1">
+        대한민국 9세 남아 평균 신장 130cm / 평균 체중 30kg<br>출처: 대한소아청소년과학회 2024 성장통계
+      </div>
+
+      <!-- BMI 그래프 -->
+      <h3 class="text-md font-semibold text-indigo-600 mt-6 mb-2">BMI 평가</h3>
+      <div class="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
+        <div class="absolute left-0 top-0 h-full bg-blue-400" style="width:25%;"></div>
+        <div class="absolute left-25% top-0 h-full bg-green-400" style="width:20%;"></div>
+        <div class="absolute left-45% top-0 h-full bg-yellow-400" style="width:20%;"></div>
+        <div class="absolute left-65% top-0 h-full bg-orange-400" style="width:35%;"></div>
+        <div class="absolute top-[-20px] left-25%">18.5</div>
+        <div class="absolute top-[-20px] left-45%">23</div>
+        <div class="absolute top-[-20px] left-65%">25</div>
+        <div class="absolute top-full left-[43%] text-xs font-bold text-black">BMI 17.5</div>
+      </div>
+    </div>
+
+    <!-- 체력 측정 종합 (Radar Chart) -->
+    <div class="glass-card">
+      <h2 class="text-lg font-bold text-indigo-700 mb-4">체력 측정 종합</h2>
+      <canvas id="radarChart"></canvas>
+    </div>
+
+    <!-- 항목별 세부 평가 (카드) -->
+    <div class="glass-card">
+      <h2 class="text-lg font-bold text-indigo-700 mb-4">항목별 세부 평가</h2>
+
+      <!-- 예시 카드 -->
+      <div class="p-4 bg-white rounded-lg shadow mb-4">
+        <h3 class="text-lg font-bold mb-2">유연성</h3>
+        <div class="w-full bg-gray-200 rounded-full h-4 relative mb-2">
+          <div class="bg-blue-400 h-full rounded-full" style="width:70%;"></div>
+          <span class="absolute inset-0 text-xs font-bold text-white flex justify-center items-center">70점</span>
+        </div>
+        <p class="text-sm text-gray-700 mb-2">좌전굴 테스트로 평가되었습니다. 꾸준한 스트레칭을 권장합니다.</p>
+        <button onclick="openMethodModal('좌전굴', '좌전굴은 앉은 자세에서 손끝을 앞으로 뻗어 유연성을 측정합니다.')" class="text-xs text-blue-500 underline">측정 방법 보기</button>
+      </div>
+
+    </div>
+
+    <!-- 상담문의 및 링크트리 -->
+    <div class="text-center text-xs text-gray-500 mt-10 mb-4">
+      상담문의 : 010-5380-5840<br>
+      <a href="https://linktr.ee/Kokenigym" target="_blank" class="underline text-blue-600">코크니짐 Linktree 바로가기</a>
+    </div>
+
+  </div>
+
+  <!-- PDF 저장 버튼 -->
+  <div class="fixed bottom-6 right-6">
+    <button onclick="downloadPDF()" class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-full shadow-lg">
+      PDF 저장
+    </button>
+  </div>
+
+  <!-- 측정 방법 모달 -->
+  <div id="methodModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+      <h3 id="methodTitle" class="text-lg font-bold mb-4 text-center text-indigo-700"></h3>
+      <p id="methodDesc" class="text-sm text-gray-700 text-center"></p>
+      <div class="text-center mt-6">
+        <button onclick="closeMethodModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-1 px-4 rounded-full text-sm">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function downloadPDF() {
+      const element = document.getElementById('captureArea');
+      html2pdf().from(element).set({
+        margin: 0.5,
+        filename: '홍길동_20250427_Kokeni.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      }).save();
+    }
+
+    function openMethodModal(title, desc) {
+      document.getElementById('methodTitle').innerText = title;
+      document.getElementById('methodDesc').innerText = desc;
+      document.getElementById('methodModal').classList.remove('hidden');
+    }
+
+    function closeMethodModal() {
+      document.getElementById('methodModal').classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
