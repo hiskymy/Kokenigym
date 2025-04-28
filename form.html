@@ -346,9 +346,13 @@ function submitResult() {
   tests.forEach((_, i) => {
     if (formData[`t${i}1`] === '' || formData[`t${i}1`] == null) missing.push(`${tests[i]} 1회`);
   });
-  if (missing.length) { closeConfirm(); showError(missing); return; }
+  if (missing.length) { 
+    closeConfirm(); 
+    showError(missing); 
+    return; 
+  }
 
-  // 여기부터 중요: 1회 값이 있으면만 2회 값을 복사
+  // 2회 측정값 자동 복사
   tests.forEach((_, i) => {
     const v1 = formData[`t${i}1`];
     if ((v1 !== '' && v1 != null) && (formData[`t${i}2`] === '' || formData[`t${i}2`] == null)) {
@@ -356,10 +360,18 @@ function submitResult() {
     }
   });
 
-  // formData를 JSON으로 출력
-  const jsonResult = JSON.stringify(formData, null, 2);
-  console.log(jsonResult);
-  alert('제출 완료!\n\n' + jsonResult);
+  // formData를 URL 파라미터로 변환
+  const params = new URLSearchParams();
+  for (const key in formData) {
+    if (formData[key] !== '' && formData[key] !== null && formData[key] !== undefined) {
+      params.append(key, formData[key]);
+    }
+  }
+
+  console.log(JSON.stringify(formData, null, 2)); // 디버깅용 출력 (필요 없으면 삭제 가능)
+
+  // 결과지로 이동
+  window.location.href = 'https://hiskymy.github.io/kokenigym/result.html?' + params.toString();
 }
 </script>
 
