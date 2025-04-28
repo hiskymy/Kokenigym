@@ -6,43 +6,42 @@
   <title>코크니짐 체력측정 입력</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-100 to-indigo-100 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen flex flex-col items-center justify-center p-4">
 
   <!-- 시작 섹션 -->
-  <div id="startSection" class="text-center">
+  <div id="startSection" class="text-center space-y-6">
     <h1 class="text-3xl font-extrabold mb-6 text-indigo-700">코크니짐 체력측정 입력</h1>
     <button type="button" onclick="startInput()"
-            class="transition bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300">
+      class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full shadow-md transform hover:scale-105 transition duration-200">
       측정 시작하기
     </button>
   </div>
 
   <!-- 입력 폼 섹션 -->
-  <div id="formSection" class="hidden w-full max-w-md space-y-6">
-    <div id="formCards" class="space-y-6"></div>
+  <div id="formSection" class="hidden w-full max-w-md space-y-8 mt-8">
+    <div id="formCards" class="space-y-8"></div>
     <div id="navButtons" class="flex justify-between">
       <button type="button" onclick="prevStep()"
-              class="transition bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded shadow">
+        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-200">
         이전
       </button>
       <button type="button" onclick="nextStep()"
-              class="transition bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow">
+        class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-200">
         다음
       </button>
     </div>
-    <div id="submitAll" class="hidden flex justify-center mt-4">
+    <div id="submitAll" class="hidden flex justify-center mt-6">
       <button type="button" onclick="showConfirmPopup()"
-              class="transition bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow">
+        class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-8 rounded-full shadow-md transform hover:scale-105 transition duration-200">
         제출하기
       </button>
     </div>
   </div>
 
-  <!-- 확인 팝업 -->
+  <!-- 최종 확인 팝업 (기존 유지) -->
   <div id="confirmPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
     <div class="bg-white rounded-lg p-6 w-full max-w-2xl shadow-2xl relative">
-      <button type="button" onclick="closeConfirm()"
-              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
+      <button type="button" onclick="closeConfirm()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
       <h3 class="text-xl font-bold mb-4 text-indigo-700 text-center">입력한 내용을 확인해주세요</h3>
       <div class="overflow-x-auto mb-4">
         <table class="w-full text-xs table-auto border">
@@ -62,20 +61,23 @@
       </div>
       <div class="flex justify-center space-x-4 mt-6">
         <button type="button" onclick="goBackToForm()"
-                class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-6 rounded shadow">수정하기</button>
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-200">
+          수정하기
+        </button>
         <button type="button" onclick="submitResult()"
-                class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded shadow">결과확인</button>
+          class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-full shadow-md transform hover:scale-105 transition duration-200">
+          결과확인
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 오류 팝업 -->
+  <!-- 에러 팝업 -->
   <div id="errorPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
     <div class="bg-red-50 border-l-4 border-red-500 p-4 w-full max-w-sm rounded shadow-lg">
       <p id="errorMessage" class="text-red-700 text-sm"></p>
       <div class="text-right mt-2">
-        <button type="button" onclick="closeError()"
-                class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">확인</button>
+        <button type="button" onclick="closeError()" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">확인</button>
       </div>
     </div>
   </div>
@@ -298,21 +300,32 @@ function showConfirmPopup() {
     basicBody.appendChild(tr);
   }
 
-  // 측정값 표
-  const testBody = document.getElementById('confirmTestBody');
-  testBody.innerHTML = '';
-  tests.forEach((l,i)=>{
-    const v1 = formData[`t${i}1`];
-    const hasSecond = formData[`t${i}2`]!=='';
-    const tr = document.createElement('tr');
-    if (hasSecond) {
-      const v2 = formData[`t${i}2`];
-      tr.innerHTML = `<td class="p-2 border">${l}</td><td class="p-2 border">${v1}</td><td class="p-2 border">${v2}</td>`;
-    } else {
-      tr.innerHTML = `<td class="p-2 border">${l}</td><td colspan="2" class="p-2 border">${v1}</td>`;
-    }
-    testBody.appendChild(tr);
-  });
+// 측정값 표
+const testBody = document.getElementById('confirmTestBody');
+testBody.innerHTML = '';
+tests.forEach((l, i) => {
+  const v1 = formData[`t${i}1`];
+  const v2 = formData[`t${i}2`];
+
+  const tr = document.createElement('tr');
+
+  if (v2 !== '' && v2 != null) { 
+    // 2회 측정값이 있을 때 (정상적으로 1회/2회 나눠서 표시)
+    tr.innerHTML = `
+      <td class="p-2 border">${l}</td>
+      <td class="p-2 border">${v1}</td>
+      <td class="p-2 border">${v2}</td>
+    `;
+  } else {
+    // 2회 측정값이 없으면 하나로 합쳐서 표시
+    tr.innerHTML = `
+      <td class="p-2 border">${l}</td>
+      <td colspan="2" class="p-2 border">${v1}</td>
+    `;
+  }
+
+  testBody.appendChild(tr);
+});
 
   document.getElementById('confirmPopup').classList.remove('hidden');
 }
@@ -328,11 +341,25 @@ function submitResult() {
   const missing = [];
   if (!formData.name) missing.push('이름');
   if (!formData.birth) missing.push('생년월일');
-  if (formData.height===''||formData.height==null) missing.push('신장');
-  if (formData.weight===''||formData.weight==null) missing.push('체중');
-  tests.forEach((_,i)=>{ if (formData[`t${i}1`]===''||formData[`t${i}1`]==null) missing.push(`${tests[i]} 1회`); });
+  if (formData.height === '' || formData.height == null) missing.push('신장');
+  if (formData.weight === '' || formData.weight == null) missing.push('체중');
+  tests.forEach((_, i) => {
+    if (formData[`t${i}1`] === '' || formData[`t${i}1`] == null) missing.push(`${tests[i]} 1회`);
+  });
   if (missing.length) { closeConfirm(); showError(missing); return; }
-  alert('제출 완료!');
+
+  // 여기부터 중요: 1회 값이 있으면만 2회 값을 복사
+  tests.forEach((_, i) => {
+    const v1 = formData[`t${i}1`];
+    if ((v1 !== '' && v1 != null) && (formData[`t${i}2`] === '' || formData[`t${i}2`] == null)) {
+      formData[`t${i}2`] = v1;
+    }
+  });
+
+  // formData를 JSON으로 출력
+  const jsonResult = JSON.stringify(formData, null, 2);
+  console.log(jsonResult);
+  alert('제출 완료!\n\n' + jsonResult);
 }
 </script>
 
