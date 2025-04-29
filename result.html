@@ -220,6 +220,8 @@
       <div class="glass-card text-left">
         <h2 class="text-lg font-bold text-indigo-700 mb-4">체력 측정 종합</h2>
         <canvas id="radarChart" width="300" height="300"></canvas>
+        <div id="totalScore" class="text-center mt-6 text-2xl font-bold text-indigo-700"></div>
+
       </div>
     </div>
   </div>
@@ -253,25 +255,26 @@
   </div>
 
   <!-- (9) 멘트 수정 모달 -->
-<div id="editCommentModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white rounded-xl p-8 w-11/12 max-w-md shadow-2xl">
-    <h3 id="editCommentTitle" class="text-lg font-bold text-center text-indigo-700 mb-4">멘트 수정</h3>
-    <p id="editCommentLabel" class="text-center text-gray-600 mb-2 text-sm"></p>
-    <textarea id="editCommentInput" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-4" rows="4"></textarea>
-    <div class="flex justify-end space-x-4">
-      <button onclick="closeEditCommentModal()" class="px-4 py-2 rounded-full bg-gray-300 hover:bg-gray-400 text-sm font-semibold">취소</button>
-      <button onclick="saveEditedComment()" class="px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold">저장</button>
+  <div id="editCommentModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white rounded-xl p-8 w-11/12 max-w-md shadow-2xl">
+      <h3 id="editCommentTitle" class="text-lg font-bold text-center text-indigo-700 mb-4">멘트 수정</h3>
+      <p id="editCommentLabel" class="text-center text-gray-600 mb-2 text-sm"></p>
+      <textarea id="editCommentInput" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-4" rows="4"></textarea>
+      <div class="flex justify-end space-x-4">
+        <button onclick="closeEditCommentModal()" class="px-4 py-2 rounded-full bg-gray-300 hover:bg-gray-400 text-sm font-semibold">취소</button>
+        <button onclick="saveEditedComment()" class="px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold">저장</button>
+      </div>
     </div>
   </div>
-</div>
+  
     
   <!-- (10) 참고 기준 모달 -->
   <div id="referenceModal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 z-50">
     <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
       <h3 class="text-lg font-bold mb-6 text-center text-indigo-700">참고 기준표</h3>
       <div class="flex justify-center mb-6 space-x-2">
-        <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세</button>
-        <button onclick="showPAPSStandard()" class="tab-button">12세 이상</button>
+        <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세(코크니짐)</button>
+        <button onclick="showPAPSStandard()" class="tab-button">12세 이상(PAPS)</button>
       </div>
       <div id="youthStandard" class="overflow-x-auto mb-4"></div>
       <div id="papsStandard" class="hidden overflow-x-auto mb-4"></div>
@@ -330,7 +333,7 @@
     function setupBasicInfo(d) {
       document.getElementById('nameCell').innerText = safe(d.name);
       document.getElementById('genderCell').innerText = safe(d.gender);
-      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` (만 ${calculateAge(d.birth, d.measureDate)}세)` : '');
+      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.birth, d.measureDate)}` : '');
       document.getElementById('measureDateCell').innerText = safe(d.measureDate);
       document.getElementById('heightCell').innerText = safe(d.height);
       document.getElementById('weightCell').innerText = safe(d.weight);
@@ -342,25 +345,57 @@
         document.getElementById('bmiMarkerArrow').style.left = mk + '%';
         document.getElementById('bmiMarkerValue').style.left = mk + '%';
         document.getElementById('bmiMarkerValue').innerText = bmi;
-      }
+      }      
+      if (d.height && d.weight && d.gender && d.birth && d.measureDate) {
+        const heightCell = document.getElementById('heightCell');
+        const weightCell = document.getElementById('weightCell');
+        const genderCell = document.getElementById('genderCell');
+        
+    
+        const birthYear = new Date(d.birth).getFullYear();
+        const measureYear = new Date(d.measureDate).getFullYear();
+        let age = measureYear - birthYear;
+
+        displayAverage(heightCell, weightCell, d.gender, d.birth, d.measureDate)
+
+    }
+
     }
 
     // (11-6) 레이더 차트 그리기
     function drawRadarChart(tests) {
       const ctx = document.getElementById('radarChart').getContext('2d');
+
+      const scores = tests.map(t => t.t1 || 0);
+      // 총점 계산
+      const totalScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        // 등급 계산
+        let grade = '';
+        if (totalScore >= 90) grade = '1등급 (매우 우수)';
+        else if (totalScore >= 70) grade = '2등급 (우수)';
+        else if (totalScore >= 50) grade = '3등급 (보통)';
+        else if (totalScore >= 30) grade = '4등급 (미흡)';
+        else grade = '5등급 (매우 미흡)';
+
+      const totalScoreDiv = document.getElementById('totalScore');
+        if (totalScoreDiv) {
+            totalScoreDiv.innerHTML = `
+            총점 <span class="text-3xl text-green-600">${totalScore}점</span> / ${grade}
+            `;
+        }
       new Chart(ctx, {
         type: 'radar',
         data: {
           labels: tests.map(t => t.label),
           datasets: [
-            { label: '1회 측정', data: tests.map(t => t.t1 || 0), fill: true, backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,1)' },
-            { label: '2회 측정', data: tests.map(t => t.t2 || 0), fill: true, backgroundColor: 'rgba(16,185,129,0.2)', borderColor: 'rgba(16,185,129,1)' }
+            { label: '1회 측정', data: tests.map(t => calculateScore(t.label,t.t1)), fill: true, backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,1)' },
+            { label: '2회 측정', data: tests.map(t => calculateScore(t.label,t.t2)), fill: true, backgroundColor: 'rgba(16,185,129,0.2)', borderColor: 'rgba(16,185,129,1)' }
           ]
         },
         options: {
           responsive: true,
           plugins: { legend: { position: 'top' } },
-          scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+          scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks:{stepSize: 20}}  }
         }
       });
     }
@@ -455,14 +490,73 @@
       return 3;
     }
 
+    const firstGradeCriteria = {
+        '유연성': {
+          5: 13, 6: 13, 7: 13, 8: 13, 9: 13,
+          10: 13, 11: 13, 12: 15, 13: 15, 14: 15, 15: 15, 16: 15, 17: 15, 18: 15
+        },
+        '근력': {
+          5: 60, 6: 60, 7: 60, 8: 60, 9: 60,
+          10: 60, 11: 60, 12: 35, 13: 35, 14: 35, 15: 35, 16: 35, 17: 35, 18: 35
+        },
+        '순발력': {
+          5: 120, 6: 120, 7: 120, 8: 140, 9: 140,
+          10: 160, 11: 160, 12: 160, 13: 160, 14: 160, 15: 160, 16: 160, 17: 160, 18: 160
+        },
+        '민첩성': {
+          5: 4.5, 6: 4.5, 7: 4.5, 8: 4.5, 9: 4.5,
+          10: 4.5, 11: 4.5, 12: 10, 13: 10, 14: 10, 15: 10, 16: 10, 17: 10, 18: 10
+        },
+        '평형성': {
+          5: 60, 6: 60, 7: 60, 8: 60, 9: 60,
+          10: 60, 11: 60, 12: 60, 13: 60, 14: 60, 15: 60, 16: 60, 17: 60, 18: 60
+        },
+        '협응성': {
+          5: 3, 6: 3, 7: 3, 8: 3, 9: 3,
+          10: 3, 11: 3, 12: 60, 13: 60, 14: 60, 15: 60, 16: 60, 17: 60, 18: 60
+        }
+      };
+    
+    function calculateScore(label,value){
+        if (value === undefined || value === null || isNaN(value))return 0;
+        const age = userAge;
+        const standard = firstGradeCriteria[label] ? firstGradeCriteria[label][age] : null;
+        let score = 0;
+        if (value !== undefined && value !== null){       
+            if (label === '민첩성') {
+                score = standard / value;  // 민첩성은 나누기로 계산                
+            } else {
+                score = value / standard;  // 나머지 항목은 나누기 방식으로                
+            }
+            score = score >= 1 ? 100 : Math.ceil(score * 100); // 1을 넘으면 100점, 아니면 비례 계산
+            return Math.min(100,Math.ceil(score));
+        }        
+    }
+    
+      
     // (11-10) 세부 카드 생성
     function createDetailCards(tests) {
       const c = document.getElementById('detailCards');
       c.innerHTML = '';
       tests.forEach((t, i) => {
         const m = methods[i], lbl = t.label, grd = (t.t1 !== undefined) ? getGrade(t.t1, lbl) : 3;
-        const cm = gradeComments[lbl][grd];
-        const score = t.t1 || 0;
+        const cm = gradeComments[lbl][grd];        
+
+        const age = userAge; // 사용자 나이 (미리 계산해서 세팅한 값)
+        const criteriaValue = firstGradeCriteria[lbl] ? firstGradeCriteria[lbl][age] : null;
+        const firstValue = t.t1; // 1회 측정값
+        let score = 0;
+
+        // 1등급 기준을 나이에 맞게 설정한 후 점수 계산
+        if (firstValue !== undefined && criteriaValue !== null) {
+        if (lbl === '민첩성') {
+            score = criteriaValue / firstValue;  // 민첩성은 나누기로 계산
+        } else {
+            score = firstValue / criteriaValue;  // 나머지 항목은 나누기 방식으로
+        }
+            score = score >= 1 ? 100 : Math.ceil(score * 100); // 1을 넘으면 100점, 아니면 비례 계산
+        }
+
 
         // 등급에 따른 텍스트 설정
         const gradeText = ['매우우수', '우수', '보통', '노력필요'][grd];
@@ -477,11 +571,9 @@
           </div>
           <div class="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
             <div class="absolute top-0 left-0 h-full bg-indigo-400" style="width:${score}%;"></div>
-            <div class="absolute w-full text-center text-xs font-bold leading-6">${score}</div>
+            <div class="absolute w-full text-center text-xs font-bold leading-6">${score}점</div>
           </div>
-          <div class="mt-3">
-            <p id="comment-${i}" class="text-xs text-gray-700 leading-relaxed cursor-pointer hover:underline" onclick="openEditCommentModal(${i}, '${lbl}')">${cm}</p>
-          </div>
+
           <table class="w-full text-xs mt-4">
             <tbody>
               <tr>
@@ -492,6 +584,9 @@
               <tr><th class="text-left">2회 측정값</th><td>${safe(t.t2)}</td></tr>
             </tbody>
           </table>
+          <div class="mt-3">
+            <p id="comment-${i}" class="text-xs text-gray-700 leading-relaxed cursor-pointer hover:underline" onclick="editComment(${i}, '${lbl}')">${cm}</p>
+          </div>
         `;
         c.appendChild(card);
       });
@@ -536,34 +631,35 @@
         })
         .save();
     }
-
+    let currentEditIndex = null;
     // (16) 항목별 코멘트 수정 기능
     function editComment(index, label) {
+      currentEditIndex = index;
+      document.getElementById('editCommentTitle').innerText = "멘트 수정";
+      document.getElementById('editCommentLabel').innerText = `수정 항목: ${label}`;
       const oldComment = document.getElementById(`comment-${index}`).innerText;
-      const newComment = prompt(`${label} 항목에 대한 새로운 코멘트를 입력하세요:`, oldComment);
-      if (newComment !== null) {
-        document.getElementById(`comment-${index}`).innerText = newComment;
-      }
+      document.getElementById('editCommentInput').value = oldComment;
+      document.getElementById('editCommentModal').classList.remove('hidden');
     }
-function openEditCommentModal(currentText, label, targetElement) {
-  document.getElementById('editCommentTitle').innerText = "멘트 수정";
-  document.getElementById('editCommentLabel').innerText = `수정 항목: ${label}`;
-  document.getElementById('editCommentInput').value = currentText;
-  document.getElementById('editCommentModal').classList.remove('hidden');
-  window.currentEditTarget = targetElement;
-}
+    function openEditCommentModal(currentText, label, targetElement) {
+        document.getElementById('editCommentTitle').innerText = "멘트 수정";
+        document.getElementById('editCommentLabel').innerText = `수정 항목: ${label}`;
+        document.getElementById('editCommentInput').value = currentText;
+        document.getElementById('editCommentModal').classList.remove('hidden');
+        window.currentEditTarget = targetElement;
+    }
 
-function closeEditCommentModal() {
-  document.getElementById('editCommentModal').classList.add('hidden');
-}
+    function closeEditCommentModal() {
+        document.getElementById('editCommentModal').classList.add('hidden');
+    }
 
-function saveEditedComment() {
-  const newComment = document.getElementById('editCommentInput').value.trim();
-  if (newComment && window.currentEditTarget) {
-    window.currentEditTarget.innerText = newComment;
-  }
-  closeEditCommentModal();
-}
+    function saveEditedComment() {
+        const newComment = document.getElementById('editCommentInput').value.trim();
+        if (newComment !== null) {
+            document.getElementById(`comment-${currentEditIndex}`).innerText = newComment;
+          }
+        closeEditCommentModal();
+    }
     // (17) 반응형 레이아웃 전환
     function switchLayout(mode) {
       const wrapper = document.getElementById('wrapper');
@@ -613,16 +709,52 @@ function saveEditedComment() {
     };
 
     // (19) 평균 신장/체중 표시 함수
-    function displayAverage(heightCell, weightCell, gender, age) {
-      const avg = averageData[gender === '남성' ? 'male' : 'female'][age];
-      if (avg) {
-        heightCell.innerHTML += ` / 평균 ${avg.height}cm`;
-        weightCell.innerHTML += ` / 평균 ${avg.weight}kg`;
-      } else {
-        heightCell.innerHTML += ` / 평균 데이터 없음`;
-        weightCell.innerHTML += ` / 평균 데이터 없음`;
-      }
+// (19) 평균 신장/체중 표시 함수 (최신 수정 버전)
+    function displayAverage(heightCell, weightCell, gender, birthYear, measureDate) {
+        const infoDiv = document.getElementById('averageInfo');  // 출처와 평균 문구 표시할 div
+        if (!infoDiv) return;
+    
+        // 나이 계산
+        const birth = new Date(birthYear);
+        const measure = new Date(measureDate);
+        let age = measure.getFullYear() - birth.getFullYear();
+        const m = measure.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && measure.getDate() < birth.getDate())) {
+        age--;
+        }
+    
+        const data = averageData[gender === '남성' ? 'male' : 'female'][age];
+    
+        if (data) {
+        infoDiv.innerHTML = `
+            대한민국 ${age}세 ${gender} 평균 신장 ${data.height}cm / 평균 체중 ${data.weight}kg<br>
+            <span class="text-gray-400 text-xs">출처: 대한소아청소년과학회 2024 성장통계</span>
+        `;
+        } else {
+        infoDiv.innerHTML = `
+            대한민국 ${age}세 ${gender} 평균 데이터가 없습니다.<br>
+            <span class="text-gray-400 text-xs">출처: 대한소아청소년과학회 2024 성장통계</span>
+        `;
+        }
     }
+  
+
+    let userAge = 0; // 사용자 나이 초기화
+
+    // 나이 계산 함수
+    function calculateAge(birth, measureDate) {
+        const birthDate = new Date(birth);
+        const measure = new Date(measureDate);
+        let age = measure.getFullYear() - birthDate.getFullYear();
+        const m = measure.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && measure.getDate() < birthDate.getDate())) {
+            age--;
+         }
+        userAge = age; // 나이를 계산한 후 userAge에 저장
+
+        return `(만 ${age}세)`; // 나이 리턴
+    }
+
     // (20) 문서가 로드된 후 실행
     document.addEventListener('DOMContentLoaded', () => {
       const data = getParams();
@@ -666,59 +798,21 @@ function saveEditedComment() {
         <table class="w-full text-xs table-auto border">
           <thead class="bg-gray-100 text-gray-700">
             <tr>
-              <th class="p-2 border">항목</th>
-              <th class="p-2 border">1등급</th>
-              <th class="p-2 border">2등급</th>
-              <th class="p-2 border">3등급</th>
-              <th class="p-2 border">4등급</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="p-2 border">유연성 (좌전굴)</td>
-              <td class="p-2 border">13cm 이상</td>
-              <td class="p-2 border">10~12cm</td>
-              <td class="p-2 border">5~9cm</td>
-              <td class="p-2 border">5cm 미만</td>
-            </tr>
-            <tr>
-              <td class="p-2 border">근력•근지구력 (Wall Sit)</td>
-              <td class="p-2 border">60초 이상</td>
-              <td class="p-2 border">40~59초</td>
-              <td class="p-2 border">20~39초</td>
-              <td class="p-2 border">20초 미만</td>
-            </tr>
-            <tr>
-              <td class="p-2 border">순발력 (제자리멀리뛰기)</td>
-              <td class="p-2 border">140cm 이상</td>
-              <td class="p-2 border">120~139cm</td>
-              <td class="p-2 border">100~119cm</td>
-              <td class="p-2 border">99cm 이하</td>
-            </tr>
-            <tr>
-              <td class="p-2 border">민첩성 (왕복달리기)</td>
-              <td class="p-2 border">4.5초 이하</td>
-              <td class="p-2 border">4.6~5.5초</td>
-              <td class="p-2 border">5.6~6.5초</td>
-              <td class="p-2 border">6.6초 이상</td>
-            </tr>
-            <tr>
-              <td class="p-2 border">평형성 (한발서기)</td>
-              <td class="p-2 border">60초 이상</td>
-              <td class="p-2 border">40~59초</td>
-              <td class="p-2 border">20~39초</td>
-              <td class="p-2 border">20초 미만</td>
-            </tr>
-            <tr>
-              <td class="p-2 border">협응성 (공잡기)</td>
-              <td class="p-2 border">3회 이상</td>
-              <td class="p-2 border">2회</td>
-              <td class="p-2 border">1회</td>
-              <td class="p-2 border">0회</td>
-            </tr>
-          </tbody>
+                <th class="p-2 border">항목</th><th class="p-2 border">1등급</th><th class="p-2 border">2등급</th><th class="p-2 border">3등급</th><th class="p-2 border">4등급</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="p-2 border">유연성 (좌전굴)</td><td class="p-2 border">13cm 이상</td><td class="p-2 border">10~12cm</td><td class="p-2 border">5~9cm</td><td class="p-2 border">5cm 미만</td></tr>
+              <tr><td class="p-2 border">근력•근지구력 (Wall Sit)</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
+              <tr><td class="p-2 border">순발력 (5~7세)</td><td class="p-2 border">120cm 이상</td><td class="p-2 border">100~119cm</td><td class="p-2 border">80~99cm</td><td class="p-2 border">79cm 이하</td></tr>
+              <tr><td class="p-2 border">순발력 (8~9세)</td><td class="p-2 border">140cm 이상</td><td class="p-2 border">120~139cm</td><td class="p-2 border">100~119cm</td><td class="p-2 border">99cm 이하</td></tr>
+              <tr><td class="p-2 border">순발력 (10~11세)</td><td class="p-2 border">160cm 이상</td><td class="p-2 border">140~159cm</td><td class="p-2 border">120~139cm</td><td class="p-2 border">119cm 이하</td></tr>
+              <tr><td class="p-2 border">민첩성 (왕복달리기)</td><td class="p-2 border">4.5초 이하</td><td class="p-2 border">4.6~5.5초</td><td class="p-2 border">5.6~6.5초</td><td class="p-2 border">6.6초 이상</td></tr>
+              <tr><td class="p-2 border">평형성 (한발서기)</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
+              <tr><td class="p-2 border">협응성 (공잡기)</td><td class="p-2 border">3회</td><td class="p-2 border">2회</td><td class="p-2 border">1회</td><td class="p-2 border">0회</td></tr>
+            </tbody>
         </table>
-        <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 5~11세 아동을 위한 코크니짐 기준입니다.</p>
+        <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 5~11세 아동의 발달 특성을 고려하여 코크니짐 아동 발달 연구진이 직접 연구 및 검증한 기준입니다.</p>
       `;
 
       document.getElementById('papsStandard').innerHTML = `
@@ -784,7 +878,7 @@ function saveEditedComment() {
             </tr>
           </tbody>
         </table>
-        <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 PAPS 체력등급 기준을 참고하였습니다.</p>
+        <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 PAPS 체력등급 및 국내 유소년 체력 표준을 참고하여 작성되었습니다.</p>
       `;
     });
   </script>
