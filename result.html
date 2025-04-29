@@ -130,10 +130,40 @@
       background-color: #3b82f6;
       color: white;
     }
+    <style>
+  /* 데스크탑용 (A4 사이즈 유지) */
+  @media (min-width: 1140px) {
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+      background: #E0F2FE;
+    }
+
+    #wrapper { 
+      width: 1140px; /* A4 폭 */
+      min-height: 1123px; /* A4 높이 */
+      background: white;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 1rem;
+    }
+  }
+
+  /* 모바일용 (자연스럽게 100% 사용) */
+  @media (max-width: 1139px) {
+    #wrapper {
+      width: 100%;
+      padding: 1rem;
+      background: white;
+      border-radius: 1rem;
+    }
+  }
   </style>
 </head>
 <body>
-
+  <div id ="wrapper">
   <h1 class="title-gradient flex justify-between items-center">
     코크니짐 체력측정 결과지
     <div class="flex gap-2 ml-4">
@@ -739,6 +769,6 @@
       `;
     });
   </script>
-
+</div>
 </body>
 </html>
