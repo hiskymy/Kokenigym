@@ -27,20 +27,21 @@
     .active-tab { background-color: #3b82f6; color: white; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col"><!-- 헤더와 레이아웃 선택 버튼 -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="title-gradient">코크니짐 체력측정 결과지</h1>
-    <div class="flex space-x-2">
-      <button onclick="switchLayout('mobile')" class="tab-button">📱</button>
-      <button onclick="switchLayout('desktop')" class="tab-button">🖥️</button>
-    </div>
-  </div>
+<body>
 
-  <!-- 기본 정보 + 신체조성 + 육각형 -->
-  <div id="mainContent" class="flex flex-col space-y-6 lg:flex-row lg:space-x-6 lg:space-y-0">
-    <div class="flex-1 space-y-6">
-      <!-- 기본 정보 -->
-      <div class="glass-card text-left">
+<h1 class="title-gradient flex items-center justify-center gap-2">
+  코크니짐 체력측정 결과지
+  <div class="flex space-x-2">
+    <button onclick="setMobileView()" class="tab-button text-xs">📱</button>
+    <button onclick="setDesktopView()" class="tab-button text-xs">🖥️</button>
+  </div>
+</h1>
+
+<div id="mainContent" class="max-w-screen-lg mx-auto">
+  <div class="flex flex-col md:flex-row md:space-x-4">
+    <!-- 좌측 : 기본정보, 신체조성 -->
+    <div class="md:w-1/2 space-y-6">
+      <div class="glass-card">
         <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
         <table>
           <tbody>
@@ -52,8 +53,7 @@
         </table>
       </div>
 
-      <!-- 신체조성 평가 -->
-      <div class="glass-card text-left">
+      <div class="glass-card">
         <h2 class="text-lg font-bold text-indigo-700 mb-4">신체조성 평가</h2>
         <table>
           <tbody>
@@ -61,12 +61,9 @@
             <tr><th>체중 (kg)</th><td id="weightCell">-</td></tr>
           </tbody>
         </table>
-        <div class="text-xs text-right text-gray-500 mt-1" id="averageInfo">
-          평균 신장/체중 데이터 불러오는 중...
-        </div>
-
+        <div id="growthInfo" class="text-xs text-right text-gray-500 mt-1">-</div>
         <h3 class="text-md font-semibold text-indigo-600 mt-6 mb-2">BMI 평가</h3>
-        <div class="score-bar">
+        <div class="score-bar relative">
           <div class="score-seg bg-blue-400" style="left:0; width:25%;">저체중</div>
           <div class="score-seg bg-green-400" style="left:25%; width:20%;">정상</div>
           <div class="score-seg bg-yellow-400" style="left:45%; width:20%;">과체중</div>
@@ -81,355 +78,636 @@
       </div>
     </div>
 
-    <!-- 육각형 차트 -->
-    <div class="flex-1 flex items-center justify-center">
-      <div class="glass-card w-full">
+    <!-- 우측 : 체력 종합 -->
+    <div class="md:w-1/2">
+      <div class="glass-card">
         <h2 class="text-lg font-bold text-indigo-700 mb-4">체력 측정 종합</h2>
         <canvas id="radarChart" width="300" height="300"></canvas>
       </div>
     </div>
-  </div><!-- 항목별 세부 평가 -->
-  <div class="glass-card text-left mt-8">
-    <h2 class="text-lg font-bold text-indigo-700 mb-4">항목별 세부 평가</h2>
-    <div id="detailCards" class="space-y-6"></div>
   </div>
 
-  <!-- 버튼 영역 -->
+  <h2 class="text-2xl font-bold text-indigo-700 mt-10 mb-4">항목별 세부 평가</h2>
+  <div id="detailCards" class="space-y-6"></div>
+
   <div class="flex justify-center gap-4 my-8">
     <button onclick="openReferenceModal()" class="tab-button">참고 기준 보기</button>
     <button onclick="downloadPDF()" class="tab-button">PDF 저장하기</button>
   </div>
 
-  <!-- 상담문의 -->
-  <div class="text-center text-sm text-gray-600 mt-10">
+  <div class="text-center text-sm text-gray-600 mt-10 mb-4">
     상담문의 : 010-5380-5840<br>
     <a href="https://linktr.ee/Kokenigym" target="_blank" class="text-blue-600 underline">코크니짐 Linktree 바로가기</a>
-  </div><!-- 측정 방법 모달 -->
-  <div id="methodModal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-40 z-50">
-    <div class="bg-white rounded-lg p-6 w-11/12 max-w-md shadow-lg">
-      <h3 id="methodTitle" class="text-lg font-bold mb-4 text-center text-indigo-700"></h3>
-      <p id="methodDesc" class="text-sm text-gray-700 mb-4 text-center"></p>
-      <div class="text-center">
-        <button onclick="closeMethodModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-4 rounded-full text-sm">닫기</button>
-      </div>
+  </div>
+</div>
+<!-- 측정 방법 모달 -->
+<div id="methodModal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-40 z-50">
+  <div class="bg-white rounded-lg p-6 w-11/12 max-w-md shadow-lg">
+    <h3 id="methodTitle" class="text-lg font-bold mb-4 text-center text-indigo-700"></h3>
+    <p id="methodDesc" class="text-sm text-gray-700 mb-4 text-center"></p>
+    <div class="text-center">
+      <button onclick="closeMethodModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-4 rounded-full text-sm">닫기</button>
     </div>
   </div>
+</div>
 
-  <!-- 멘트 수정 모달 -->
-  <div id="commentModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg shadow-md w-11/12 max-w-md">
-      <h3 class="text-lg font-bold text-center mb-4">멘트 수정</h3>
-      <textarea id="commentEditor" class="w-full border p-2 rounded" rows="4"></textarea>
-      <div class="text-center mt-4">
-        <button onclick="saveComment()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-full">저장</button>
-        <button onclick="closeCommentModal()" class="ml-2 text-gray-600" >취소</button>
-      </div>
+<!-- 멘트 수정 모달 -->
+<div id="editCommentModal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-40 z-50">
+  <div class="bg-white rounded-lg p-6 w-11/12 max-w-md shadow-lg">
+    <h3 class="text-lg font-bold mb-4 text-center text-indigo-700">멘트 수정</h3>
+    <textarea id="editCommentText" class="w-full h-32 p-2 border rounded-md text-sm" placeholder="수정할 멘트를 입력하세요"></textarea>
+    <div class="flex justify-center mt-4 gap-4">
+      <button onclick="saveCommentEdit()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-4 rounded-full text-sm">저장</button>
+      <button onclick="closeEditCommentModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded-full text-sm">취소</button>
     </div>
   </div>
+</div>
 
-  <!-- 참고 기준 모달 -->
-  <div id="referenceModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
-      <h3 class="text-lg font-bold mb-6 text-center text-indigo-700">참고 기준표</h3>
-      <div class="flex justify-center mb-6 space-x-2">
-        <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세</button>
-        <button onclick="showPAPSStandard()" class="tab-button">12세 이상</button>
-      </div>
-      <div id="youthStandard" class="overflow-x-auto mb-4"></div>
-      <div id="papsStandard" class="hidden overflow-x-auto mb-4"></div>
-      <div class="text-center mt-6">
-        <button onclick="closeReferenceModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-full">닫기</button>
-      </div>
+<!-- 참고 기준 모달 -->
+<div id="referenceModal" class="hidden fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 z-50">
+  <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
+    <h3 class="text-lg font-bold mb-6 text-center text-indigo-700">참고 기준표</h3>
+    <div class="flex justify-center mb-6 space-x-2">
+      <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세</button>
+      <button onclick="showPAPSStandard()" class="tab-button">12세 이상</button>
     </div>
-  </div><script>
-  // 안전하게 값 표시
-  function safe(v) { return (v !== undefined && v !== null && v !== '') ? v : '-'; }
+    <div id="youthStandard" class="overflow-x-auto mb-4"></div>
+    <div id="papsStandard" class="hidden overflow-x-auto mb-4"></div>
+    <div class="text-center mt-6">
+      <button onclick="closeReferenceModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-full">닫기</button>
+    </div>
+  </div>
+</div>
 
-  // 연령별 평균 키와 체중
-  const avgGrowth = {
-    5: { height: 110, weight: 18 },
-    6: { height: 116, weight: 20 },
-    7: { height: 121, weight: 22 },
-    8: { height: 127, weight: 25 },
-    9: { height: 132, weight: 28 },
-    10: { height: 137, weight: 32 },
-    11: { height: 142, weight: 36 },
-    12: { height: 149, weight: 41 },
-    13: { height: 156, weight: 47 },
-    14: { height: 162, weight: 53 },
-    15: { height: 167, weight: 58 },
-    16: { height: 170, weight: 62 },
-    17: { height: 172, weight: 65 },
-    18: { height: 173, weight: 67 }
+<!-- 전체 기능 스크립트 시작 -->
+<script>
+// 안전하게 값 표시
+function safe(v) {
+  return (v !== undefined && v !== null && v !== '') ? v : '-';
+}
+
+// URL 파라미터 읽기
+function getParams() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    name: p.get('name') || '',
+    gender: p.get('gender') || '',
+    birth: p.get('birth') || '',
+    measureDate: p.get('measureDate') || '',
+    height: p.get('height') ? parseFloat(p.get('height')) : undefined,
+    weight: p.get('weight') ? parseFloat(p.get('weight')) : undefined,
+    tests: [
+      { label:'유연성', t1:p.get('t01')?parseFloat(p.get('t01')):undefined, t2:p.get('t02')?parseFloat(p.get('t02')):undefined },
+      { label:'근력',   t1:p.get('t11')?parseFloat(p.get('t11')):undefined, t2:p.get('t12')?parseFloat(p.get('t12')):undefined },
+      { label:'순발력', t1:p.get('t21')?parseFloat(p.get('t21')):undefined, t2:p.get('t22')?parseFloat(p.get('t22')):undefined },
+      { label:'민첩성', t1:p.get('t31')?parseFloat(p.get('t31')):undefined, t2:p.get('t32')?parseFloat(p.get('t32')):undefined },
+      { label:'평형성', t1:p.get('t41')?parseFloat(p.get('t41')):undefined, t2:p.get('t42')?parseFloat(p.get('t42')):undefined },
+      { label:'협응성', t1:p.get('t51')?parseFloat(p.get('t51')):undefined, t2:p.get('t52')?parseFloat(p.get('t52')):undefined }
+    ]
   };
+}
+  <!-- 신체조성 평가 -->
+<div id="body-composition" class="section-card">
+  <h2 class="section-title">신체조성 평가</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <table class="info-table">
+        <tr><th>신장 (cm)</th><td id="heightCell">-</td></tr>
+        <tr><th>체중 (kg)</th><td id="weightCell">-</td></tr>
+      </table>
+      <div id="avgInfo" class="text-xs text-right text-gray-500 mt-1"></div>
+    </div>
+    <div>
+      <h3 class="subsection-title">BMI 평가</h3>
+      <div class="bmi-bar">
+        <div class="bmi-seg bg-blue-400" style="left:0; width:25%;">저체중</div>
+        <div class="bmi-seg bg-green-400" style="left:25%; width:20%;">정상</div>
+        <div class="bmi-seg bg-yellow-400" style="left:45%; width:20%;">과체중</div>
+        <div class="bmi-seg bg-orange-400" style="left:65%; width:35%; border-top-right-radius:9999px; border-bottom-right-radius:9999px;">비만</div>
+        <span class="threshold-label" style="left:25%;">18.5</span>
+        <span class="threshold-label" style="left:45%;">23</span>
+        <span class="threshold-label" style="left:65%;">25</span>
+        <div id="bmiMarkerLine" class="marker-line"></div>
+        <div id="bmiMarkerArrow" class="marker-arrow"></div>
+        <span id="bmiMarkerValue" class="marker-value">-</span>
+      </div>
+    </div>
+  </div>
+</div>
 
-  let currentLayout = "desktop"; // 기본은 데스크탑 레이아웃
+<!-- 체력 측정 종합 -->
+<div id="fitness-summary" class="section-card">
+  <h2 class="section-title">체력 측정 종합</h2>
+  <canvas id="radarChart" width="300" height="300" class="mx-auto"></canvas>
+</div>
 
-  // URL 파라미터 읽기
-  function getParams() {
-    const p = new URLSearchParams(window.location.search);
-    return {
-      name: p.get('name') || '',
-      gender: p.get('gender') || '',
-      birth: p.get('birth') || '',
-      measureDate: p.get('measureDate') || '',
-      height: p.get('height') ? parseFloat(p.get('height')) : undefined,
-      weight: p.get('weight') ? parseFloat(p.get('weight')) : undefined,
-      tests: [
-        { label:'유연성', t1:p.get('t01')?parseFloat(p.get('t01')):undefined, t2:p.get('t02')?parseFloat(p.get('t02')):undefined },
-        { label:'근력',   t1:p.get('t11')?parseFloat(p.get('t11')):undefined, t2:p.get('t12')?parseFloat(p.get('t12')):undefined },
-        { label:'순발력', t1:p.get('t21')?parseFloat(p.get('t21')):undefined, t2:p.get('t22')?parseFloat(p.get('t22')):undefined },
-        { label:'민첩성', t1:p.get('t31')?parseFloat(p.get('t31')):undefined, t2:p.get('t32')?parseFloat(p.get('t32')):undefined },
-        { label:'평형성', t1:p.get('t41')?parseFloat(p.get('t41')):undefined, t2:p.get('t42')?parseFloat(p.get('t42')):undefined },
-        { label:'협응성', t1:p.get('t51')?parseFloat(p.get('t51')):undefined, t2:p.get('t52')?parseFloat(p.get('t52')):undefined }
+<!-- 항목별 세부 평가 -->
+<div id="detailed-assessment" class="section-card">
+  <h2 class="section-title">항목별 세부 평가</h2>
+  <div id="detailCards" class="space-y-4"></div>
+</div>
+
+<!-- 버튼 영역 -->
+<div class="flex justify-center flex-wrap gap-4 my-8">
+  <button onclick="openReferenceModal()" class="tab-button">참고 기준 보기</button>
+  <button onclick="downloadPDF()" class="tab-button">PDF 저장하기</button>
+</div>
+
+<!-- 상담문의 -->
+<div class="text-center text-sm text-gray-600 mt-10">
+  상담문의 : 010-5380-5840<br>
+  <a href="https://linktr.ee/Kokenigym" target="_blank" class="text-blue-600 underline">코크니짐 Linktree 바로가기</a>
+</div>
+
+<!-- 모달 - 측정 방법 -->
+<div id="methodModal" class="modal hidden">
+  <div class="modal-content">
+    <h3 id="methodTitle" class="modal-title"></h3>
+    <p id="methodDesc" class="modal-desc"></p>
+    <div class="text-center mt-4">
+      <button onclick="closeMethodModal()" class="btn-secondary">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달 - 참고 기준 -->
+<div id="referenceModal" class="modal hidden">
+  <div class="modal-content max-w-3xl">
+    <h3 class="modal-title">참고 기준표</h3>
+    <div class="tab-container">
+      <button onclick="showYouthStandard()" id="btnYouthStandard" class="tab-button active-tab">5~11세</button>
+      <button onclick="showPAPSStandard()" id="btnPAPSStandard" class="tab-button">12세 이상</button>
+    </div>
+    <div id="youthStandard" class="overflow-x-auto mt-4"></div>
+    <div id="papsStandard" class="overflow-x-auto hidden mt-4"></div>
+    <div class="text-center mt-6">
+      <button onclick="closeReferenceModal()" class="btn-secondary">닫기</button>
+    </div>
+  </div>
+</div>
+  <script>
+// 안전하게 값 표시
+function safe(v) {
+  return (v !== undefined && v !== null && v !== '') ? v : '-';
+}
+
+// URL 파라미터 읽기
+function getParams() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    name: p.get('name') || '',
+    gender: p.get('gender') || '',
+    birth: p.get('birth') || '',
+    measureDate: p.get('measureDate') || '',
+    height: p.get('height') ? parseFloat(p.get('height')) : undefined,
+    weight: p.get('weight') ? parseFloat(p.get('weight')) : undefined,
+    tests: [
+      { label: '유연성', t1: p.get('t01') ? parseFloat(p.get('t01')) : undefined, t2: p.get('t02') ? parseFloat(p.get('t02')) : undefined },
+      { label: '근력', t1: p.get('t11') ? parseFloat(p.get('t11')) : undefined, t2: p.get('t12') ? parseFloat(p.get('t12')) : undefined },
+      { label: '순발력', t1: p.get('t21') ? parseFloat(p.get('t21')) : undefined, t2: p.get('t22') ? parseFloat(p.get('t22')) : undefined },
+      { label: '민첩성', t1: p.get('t31') ? parseFloat(p.get('t31')) : undefined, t2: p.get('t32') ? parseFloat(p.get('t32')) : undefined },
+      { label: '평형성', t1: p.get('t41') ? parseFloat(p.get('t41')) : undefined, t2: p.get('t42') ? parseFloat(p.get('t42')) : undefined },
+      { label: '협응성', t1: p.get('t51') ? parseFloat(p.get('t51')) : undefined, t2: p.get('t52') ? parseFloat(p.get('t52')) : undefined }
+    ]
+  };
+}
+
+// 나이 계산
+function calculateAge(birth, measure) {
+  if (!birth || !measure) return '';
+  const bd = new Date(birth);
+  const md = new Date(measure);
+  let age = md.getFullYear() - bd.getFullYear();
+  const m = md.getMonth() - bd.getMonth();
+  if (m < 0 || (m === 0 && md.getDate() < bd.getDate())) age--;
+  return age;
+}
+
+// BMI 좌표 계산
+function bmiToPosition(bmi) {
+  if (bmi < 18.5) return (bmi / 18.5) * 25;
+  if (bmi < 23) return 25 + (bmi - 18.5) / 4.5 * 20;
+  if (bmi < 25) return 45 + (bmi - 23) / 2 * 20;
+  return 65 + (bmi - 25) / 5 * 35;
+}
+
+// 연령별 평균 신장/체중 데이터
+const averageData = {
+  '5': { height: 110, weight: 18 },
+  '6': { height: 116, weight: 20 },
+  '7': { height: 122, weight: 22 },
+  '8': { height: 128, weight: 25 },
+  '9': { height: 133, weight: 28 },
+  '10': { height: 138, weight: 31 },
+  '11': { height: 143, weight: 34 },
+  '12': { height: 150, weight: 40 },
+  '13': { height: 156, weight: 45 },
+  '14': { height: 162, weight: 50 },
+  '15': { height: 168, weight: 56 },
+  '16': { height: 172, weight: 61 },
+  '17': { height: 175, weight: 65 },
+  '18': { height: 177, weight: 68 }
+};
+
+// 기본 정보 세팅
+function setupBasicInfo(data) {
+  document.getElementById('nameCell').innerText = safe(data.name);
+  document.getElementById('genderCell').innerText = safe(data.gender);
+  document.getElementById('birthCell').innerText = safe(data.birth) + (data.birth && data.measureDate ? ` (만 ${calculateAge(data.birth, data.measureDate)}세)` : '');
+  document.getElementById('measureDateCell').innerText = safe(data.measureDate);
+  document.getElementById('heightCell').innerText = safe(data.height);
+  document.getElementById('weightCell').innerText = safe(data.weight);
+
+  // BMI 마커 표시
+  if (data.height && data.weight) {
+    const bmi = (data.weight / ((data.height / 100) ** 2)).toFixed(1);
+    const mk = bmiToPosition(parseFloat(bmi));
+    document.getElementById('bmiMarkerLine').style.left = mk + '%';
+    document.getElementById('bmiMarkerArrow').style.left = mk + '%';
+    document.getElementById('bmiMarkerValue').style.left = mk + '%';
+    document.getElementById('bmiMarkerValue').innerText = bmi;
+  }
+
+  // 연령별 평균 표시
+  if (data.birth && data.measureDate) {
+    const age = calculateAge(data.birth, data.measureDate);
+    if (averageData[age]) {
+      document.getElementById('avgInfo').innerHTML = `대한민국 ${age}세 남아 평균 신장 ${averageData[age].height}cm / 평균 체중 ${averageData[age].weight}kg`;
+    } else {
+      document.getElementById('avgInfo').innerHTML = `해당 연령은 평균 데이터를 제공하지 않습니다.`;
+    }
+  }
+}
+</script>
+<script>
+// 레이더 차트 그리기
+function drawRadarChart(tests) {
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: tests.map(t => t.label),
+      datasets: [
+        {
+          label: '1회 측정',
+          data: tests.map(t => t.t1 || 0),
+          fill: true,
+          backgroundColor: 'rgba(59,130,246,0.2)',
+          borderColor: 'rgba(59,130,246,1)'
+        },
+        {
+          label: '2회 측정',
+          data: tests.map(t => t.t2 || 0),
+          fill: true,
+          backgroundColor: 'rgba(16,185,129,0.2)',
+          borderColor: 'rgba(16,185,129,1)'
+        }
       ]
-    };
-  }
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } },
+      scales: { r: { suggestedMin: 0, suggestedMax: 100 } }
+    }
+  });
+}
 
-  // 나이 계산
-  function calculateAge(birth, measure) {
-    if (!birth || !measure) return '';
-    const bd = new Date(birth), md = new Date(measure);
-    let age = md.getFullYear() - bd.getFullYear();
-    const m = md.getMonth() - bd.getMonth();
-    if (m < 0 || (m === 0 && md.getDate() < bd.getDate())) age--;
-    return age;
-  }
+// 등급별 멘트 데이터
+const gradeComments = {
+  유연성: [
+    "매우 훌륭한 유연성을 가지고 있어요! 계속 스트레칭 습관을 유지하세요.",
+    "좋은 유연성입니다. 조금 더 꾸준히 관리하면 금방 최고 수준에 도달할 수 있어요!",
+    "기본적인 유연성은 갖추었어요. 스트레칭 시간을 늘려볼까요?",
+    "아직 유연성이 부족해요. 하루 5분씩 꾸준히 연습하면 좋아질 거예요!"
+  ],
+  근력: [
+    "근력이 매우 탄탄합니다! 꾸준한 운동 습관이 느껴져요.",
+    "근력이 좋은 편이에요. 현재 운동을 꾸준히 이어가세요!",
+    "평균적인 근력입니다. 조금 더 근지구력 운동을 추가해보세요.",
+    "근력 향상이 필요합니다. 게임처럼 재미있게 운동을 시작해볼까요?"
+  ],
+  순발력: [
+    "순발력이 뛰어납니다! 폭발적인 힘을 잘 활용하세요.",
+    "순발력 좋은 편입니다. 다양한 점프 놀이를 추천해요!",
+    "순발력은 평균 정도예요. 점프 훈련을 해보면 금방 향상될 수 있어요.",
+    "순발력이 약한 편입니다. 짧은 거리 뛰기 놀이를 자주 해봐요!"
+  ],
+  민첩성: [
+    "민첩성이 아주 뛰어납니다! 방향 전환이 빠르네요!",
+    "민첩성이 좋아요. 민첩성 게임을 함께 추가해보세요!",
+    "민첩성은 평균이에요. 다양한 리듬운동을 추천합니다.",
+    "민첩성이 아직 부족해요. 즐겁게 달리기 놀이를 자주 해봐요!"
+  ],
+  평형성: [
+    "평형감각이 매우 훌륭합니다! 몸의 균형이 좋아요.",
+    "좋은 평형성입니다. 다양한 자세로 균형 연습을 해보세요!",
+    "평형성은 평균 수준입니다. 간단한 요가 동작도 도움이 돼요.",
+    "평형성이 약한 편입니다. 한발서기 게임을 매일 해보세요!"
+  ],
+  협응성: [
+    "협응력이 아주 뛰어납니다! 몸과 손의 조화가 멋져요.",
+    "협응성 좋은 편입니다. 다양한 공놀이를 더 시도해보세요!",
+    "협응성은 평균 수준입니다. 패턴 게임을 추천해요.",
+    "협응력이 아직 부족해요. 재미있는 캐치 놀이로 키워봐요!"
+  ]
+};
 
-  // BMI 위치 변환
-  function bmiToPosition(bmi) {
-    if(bmi<18.5) return (bmi/18.5)*25;
-    if(bmi<23) return 25+(bmi-18.5)/4.5*20;
-    if(bmi<25) return 45+(bmi-23)/2*20;
-    return 65+(bmi-25)/5*35;
-  }
+// 측정방법 설명
+const methods = [
+  { title: '좌전굴 (Sit and Reach Test)', desc: '앉은 자세에서 상체를 앞으로 굽혀 손끝이 닿는 거리를 측정하여 유연성을 평가합니다.' },
+  { title: '윗몸 일으키기 (Sit-up Test)', desc: '1분 동안 가능한 많은 윗몸 일으키기를 하여 근력을 평가합니다.' },
+  { title: '제자리멀리뛰기 (Standing Long Jump)', desc: '제자리에서 두 발로 멀리 뛰어 순발력을 평가합니다.' },
+  { title: '장애물 왕복달리기 (Shuttle Run)', desc: '짧은 거리 구간을 반복하여 달리는 시간을 측정하여 민첩성을 평가합니다.' },
+  { title: '한발서기 (One-leg Stand)', desc: '한 발로 버티는 시간을 측정하여 평형성을 평가합니다.' },
+  { title: '공잡기 (Ball Catching)', desc: '제한된 시간 동안 공을 잡는 횟수로 협응성을 평가합니다.' }
+];
 
-  // 기본 정보 표시
-  function setupBasicInfo(d) {
-    document.getElementById('nameCell').innerText = safe(d.name);
-    document.getElementById('genderCell').innerText = safe(d.gender);
-    document.getElementById('birthCell').innerText = safe(d.birth);
-    document.getElementById('measureDateCell').innerText = safe(d.measureDate);
-    document.getElementById('heightCell').innerText = safe(d.height);
-    document.getElementById('weightCell').innerText = safe(d.weight);
-
-    // BMI 세팅
-    const bmi = (d.height && d.weight) ? (d.weight / ((d.height/100)**2)).toFixed(1) : '-';
-    if(bmi !== '-') {
-      const mk = bmiToPosition(parseFloat(bmi));
-      document.getElementById('bmiMarkerLine').style.left = mk + '%';
-      document.getElementById('bmiMarkerArrow').style.left = mk + '%';
-      document.getElementById('bmiMarkerValue').style.left = mk + '%';
-      document.getElementById('bmiMarkerValue').innerText = bmi;
-    }
-
-    // 평균 키/몸무게 표시
-    const age = calculateAge(d.birth, d.measureDate);
-    const avg = avgGrowth[age];
-    const avgInfo = avg
-      ? `대한민국 ${age}세 평균 신장 ${avg.height}cm / 평균 체중 ${avg.weight}kg`
-      : '해당 연령은 평균 데이터를 제공하지 않습니다.';
-    document.getElementById('avgInfo').innerText = avgInfo;
-  }// 레이더 차트
-  function drawRadarChart(tests) {
-    const ctx = document.getElementById('radarChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: tests.map(t => t.label),
-        datasets: [
-          { label: '1회 측정', data: tests.map(t => t.t1 || 0), fill: true, backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,1)' },
-          { label: '2회 측정', data: tests.map(t => t.t2 || 0), fill: true, backgroundColor: 'rgba(16,185,129,0.2)', borderColor: 'rgba(16,185,129,1)' }
-        ]
-      },
-      options: { responsive: true, scales: { r: { suggestedMin: 0, suggestedMax: 100 } } }
-    });
-  }
-
-  // 항목별 등급 계산
-  function getGrade(score, cat) {
-    if (cat === '민첩성') {
-      if (score <= 4.5) return 0;
-      if (score <= 5.5) return 1;
-      if (score <= 6.5) return 2;
-      return 3;
-    }
-    if (cat === '협응성') {
-      if (score >= 3) return 0;
-      if (score >= 2) return 1;
-      if (score >= 1) return 2;
-      return 3;
-    }
-    if (cat === '순발력') {
-      if (score >= 140) return 0;
-      if (score >= 120) return 1;
-      if (score >= 100) return 2;
-      return 3;
-    }
-    if (cat === '근력') {
-      if (score >= 60) return 0;
-      if (score >= 40) return 1;
-      if (score >= 20) return 2;
-      return 3;
-    }
-    if (cat === '유연성') {
-      if (score >= 13) return 0;
-      if (score >= 10) return 1;
-      if (score >= 5) return 2;
-      return 3;
-    }
-    if (cat === '평형성') {
-      if (score >= 60) return 0;
-      if (score >= 40) return 1;
-      if (score >= 20) return 2;
-      return 3;
-    }
+// 등급 계산
+function getGrade(score, cat) {
+  if (cat === '민첩성') {
+    if (score <= 4.5) return 0;
+    if (score <= 5.5) return 1;
+    if (score <= 6.5) return 2;
     return 3;
   }
-
-  // 멘트 수정용 팝업
-  function editComment(cardId) {
-    const currentText = document.getElementById('comment_' + cardId).innerText;
-    const newComment = prompt("새로운 멘트를 입력해주세요:", currentText);
-    if (newComment !== null) {
-      document.getElementById('comment_' + cardId).innerText = newComment;
-    }
+  if (cat === '협응성') {
+    if (score >= 3) return 0;
+    if (score >= 2) return 1;
+    if (score >= 1) return 2;
+    return 3;
   }
-
-  // 항목별 카드 생성
-  function createDetailCards(tests) {
-    const container = document.getElementById('detailCards');
-    container.innerHTML = '';
-
-    tests.forEach((test, idx) => {
-      const grade = (test.t1 !== undefined) ? getGrade(test.t1, test.label) : 3;
-      const gradeText = ['아주 우수', '우수', '보통', '노력 필요'][grade];
-      const percentage = Math.min(100, Math.max(0, (test.t1 || 0)));
-
-      const card = document.createElement('div');
-      card.className = 'border rounded-lg bg-white overflow-hidden shadow';
-
-      card.innerHTML = `
-        <button class="w-full text-left p-4 font-bold text-indigo-700 bg-indigo-50" onclick="toggleCard(${idx})">
-          ${test.label} - ${grade+1}등급 (${gradeText})
-        </button>
-        <div id="cardBody${idx}" class="hidden p-4 space-y-2">
-          <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-            <div class="bg-indigo-500 h-4" style="width: ${percentage}%;">
-              <span class="text-xs text-white pl-2">${test.t1 !== undefined ? test.t1 : '-'}</span>
-            </div>
-          </div>
-          <div class="text-sm text-gray-700">
-            <b>1회 측정값:</b> ${safe(test.t1)}<br/>
-            <b>2회 측정값:</b> ${safe(test.t2)}
-          </div>
-          <div class="text-sm text-gray-600">
-            <b>측정 방법:</b> <button onclick="openMethodModal('${methods[idx].title}','${methods[idx].desc}')" class="underline text-blue-600">${methods[idx].title}</button>
-          </div>
-          <div class="text-sm text-gray-700" id="comment_${idx}" onclick="editComment(${idx})" style="cursor:pointer;">
-            ${gradeComments[test.label][grade]}
-          </div>
-        </div>
-      `;
-      container.appendChild(card);
-    });
+  if (cat === '순발력') {
+    if (score >= 140) return 0;
+    if (score >= 120) return 1;
+    if (score >= 100) return 2;
+    return 3;
   }
-
-  function toggleCard(idx) {
-    const body = document.getElementById('cardBody' + idx);
-    body.classList.toggle('hidden');
+  if (cat === '근력') {
+    if (score >= 60) return 0;
+    if (score >= 40) return 1;
+    if (score >= 20) return 2;
+    return 3;
   }
-
-  // 참고 기준 모달 열고 닫기
-  function openReferenceModal() {
-    document.getElementById('referenceModal').classList.remove('hidden');
+  if (cat === '유연성') {
+    if (score >= 13) return 0;
+    if (score >= 10) return 1;
+    if (score >= 5) return 2;
+    return 3;
   }
-  function closeReferenceModal() {
-    document.getElementById('referenceModal').classList.add('hidden');
-  }// 모바일 / 데스크탑 뷰 전환
-  function switchView(mode) {
-    const body = document.body;
-    if (mode === 'mobile') {
-      body.classList.remove('desktop');
-      body.classList.add('mobile');
-    } else {
-      body.classList.remove('mobile');
-      body.classList.add('desktop');
-    }
+  if (cat === '평형성') {
+    if (score >= 60) return 0;
+    if (score >= 40) return 1;
+    if (score >= 20) return 2;
+    return 3;
   }
-
-  // PDF 저장 기능
-  function downloadPDF() {
-    html2pdf().from(document.body).set({
-      margin: 0.5,
-      filename: 'Result.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    }).save();
-  }
-
-  // 페이지 로드 시 처리
-  document.addEventListener('DOMContentLoaded', () => {
-    const data = getParams();
-    if (data.name) {
-      setupBasicInfo(data);
-      createDetailCards(data.tests);
-      drawRadarChart(data.tests);
-    } else {
-      setupBasicInfo({});
-      createDetailCards([
-        {label:'유연성',t1:0,t2:0},
-        {label:'근력',t1:0,t2:0},
-        {label:'순발력',t1:0,t2:0},
-        {label:'민첩성',t1:0,t2:0},
-        {label:'평형성',t1:0,t2:0},
-        {label:'협응성',t1:0,t2:0}
-      ]);
-      drawRadarChart([
-        {label:'유연성',t1:0,t2:0},
-        {label:'근력',t1:0,t2:0},
-        {label:'순발력',t1:0,t2:0},
-        {label:'민첩성',t1:0,t2:0},
-        {label:'평형성',t1:0,t2:0},
-        {label:'협응성',t1:0,t2:0}
-      ]);
-    }
-
-    // 참고 기준표 세팅
-    document.getElementById('youthStandard').innerHTML = `
-      <table class="w-full text-xs table-auto border">
-        <thead class="bg-gray-100 text-gray-700">
-          <tr><th class="p-2 border">항목</th><th class="p-2 border">1등급</th><th class="p-2 border">2등급</th><th class="p-2 border">3등급</th><th class="p-2 border">4등급</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="p-2 border">유연성</td><td class="p-2 border">13cm 이상</td><td class="p-2 border">10~12cm</td><td class="p-2 border">5~9cm</td><td class="p-2 border">5cm 미만</td></tr>
-          <tr><td class="p-2 border">근력</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
-          <tr><td class="p-2 border">순발력</td><td class="p-2 border">140cm 이상</td><td class="p-2 border">120~139cm</td><td class="p-2 border">100~119cm</td><td class="p-2 border">99cm 이하</td></tr>
-          <tr><td class="p-2 border">민첩성</td><td class="p-2 border">4.5초 이하</td><td class="p-2 border">4.6~5.5초</td><td class="p-2 border">5.6~6.5초</td><td class="p-2 border">6.6초 이상</td></tr>
-          <tr><td class="p-2 border">평형성</td><td class="p-2 border">60초 이상</td><td class="p-2 border">40~59초</td><td class="p-2 border">20~39초</td><td class="p-2 border">20초 미만</td></tr>
-          <tr><td class="p-2 border">협응성</td><td class="p-2 border">3회</td><td class="p-2 border">2회</td><td class="p-2 border">1회</td><td class="p-2 border">0회</td></tr>
-        </tbody>
-      </table>
-      <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 5~11세 아동을 위한 코크니짐 기준입니다.</p>
-    `;
-    document.getElementById('papsStandard').innerHTML = `
-      <table class="w-full text-xs table-auto border">
-        <thead class="bg-gray-100 text-gray-700">
-          <tr><th class="p-2 border">항목</th><th class="p-2 border">1등급</th><th class="p-2 border">2등급</th><th class="p-2 border">3등급</th><th class="p-2 border">4등급</th><th class="p-2 border">5등급</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="p-2 border">유연성</td><td class="p-2 border">15cm 이상</td><td class="p-2 border">10~14cm</td><td class="p-2 border">5~9cm</td><td class="p-2 border">1~4cm</td><td class="p-2 border">0cm 이하</td></tr>
-          <tr><td class="p-2 border">근력</td><td class="p-2 border">35회 이상</td><td class="p-2 border">30~34회</td><td class="p-2 border">25~29회</td><td class="p-2 border">20~24회</td><td class="p-2 border">19회 이하</td></tr>
-          <tr><td class="p-2 border">순발력</td><td class="p-2 border">160cm 이상</td><td class="p-2 border">150~159cm</td><td class="p-2 border">140~149cm</td><td class="p-2 border">130~139cm</td><td class="p-2 border">129cm 이하</td></tr>
-          <tr><td class="p-2 border">민첩성</td><td class="p-2 border">10초 이하</td><td class="p-2 border">10.1~11초</td><td class="p-2 border">11.1~12초</td><td class="p-2 border">12.1~13초</td><td class="p-2 border">13.1초 이상</td></tr>
-          <tr><td class="p-2 border">평형성</td><td class="p-2 border">60초 이상</td><td class="p-2 border">45~59초</td><td class="p-2 border">30~44초</td><td class="p-2 border">15~29초</td><td class="p-2 border">14초 이하</td></tr>
-          <tr><td class="p-2 border">협응성</td><td class="p-2 border">60회 이상</td><td class="p-2 border">50~59회</td><td class="p-2 border">40~49회</td><td class="p-2 border">30~39회</td><td class="p-2 border">29회 이하</td></tr>
-        </tbody>
-      </table>
-      <p class="text-xs text-gray-500 text-center mt-2">※ 본 기준은 PAPS 체력등급 기준을 참고하였습니다.</p>
-    `;
-  });
+  return 3;
+}
 </script>
+<script>
+// 세부 카드 생성
+function createDetailCards(tests) {
+  const container = document.getElementById('detailCards');
+  container.innerHTML = '';
+
+  tests.forEach((t, i) => {
+    const method = methods[i];
+    const label = t.label;
+    const grade = (t.t1 !== undefined) ? getGrade(t.t1, label) : 3;
+    const comment = gradeComments[label][grade];
+
+    const card = document.createElement('div');
+    card.className = 'glass-card';
+
+    card.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h2 class="text-md font-bold text-indigo-700">${label}</h2>
+        <div class="text-right">
+          <span class="text-xs text-gray-600">${['우수', '양호', '보통', '미흡'][grade]} (${grade + 1}등급)</span>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center space-x-2">
+        <div class="flex-1 bg-gray-200 rounded-full h-2 relative">
+          <div class="bg-blue-400 h-2 rounded-full" style="width: ${Math.min((t.t1 || 0), 100)}%;"></div>
+          <div class="absolute top-[-20px] left-[calc(${Math.min((t.t1 || 0), 100)}%-10px)] text-xs">${safe(t.t1)}</div>
+        </div>
+      </div>
+      <table class="w-full text-xs mt-4">
+        <tbody>
+          <tr>
+            <th class="text-left w-1/3">측정 방법</th>
+            <td>
+              <button onclick="openMethodModal('${method.title}','${method.desc}')" class="text-blue-600 underline">${method.title}</button>
+            </td>
+          </tr>
+          <tr><th class="text-left">1회 측정값</th><td>${safe(t.t1)}</td></tr>
+          <tr><th class="text-left">2회 측정값</th><td>${safe(t.t2)}</td></tr>
+        </tbody>
+      </table>
+      <p class="text-xs text-gray-700 mt-2 leading-relaxed cursor-pointer" onclick="editComment(this)">${comment}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// 측정방법 팝업
+function openMethodModal(title, desc) {
+  document.getElementById('methodTitle').innerText = title;
+  document.getElementById('methodDesc').innerText = desc;
+  document.getElementById('methodModal').classList.remove('hidden');
+}
+function closeMethodModal() {
+  document.getElementById('methodModal').classList.add('hidden');
+}
+
+// 코멘트 수정
+function editComment(pElement) {
+  const currentComment = pElement.innerText;
+  const newComment = prompt('수정할 내용을 입력하세요:', currentComment);
+  if (newComment !== null && newComment.trim() !== '') {
+    pElement.innerText = newComment;
+  }
+}
+
+// 참고 기준 모달 제어
+function openReferenceModal() {
+  document.getElementById('referenceModal').classList.remove('hidden');
+}
+function closeReferenceModal() {
+  document.getElementById('referenceModal').classList.add('hidden');
+}
+function showYouthStandard() {
+  document.getElementById('youthStandard').classList.remove('hidden');
+  document.getElementById('papsStandard').classList.add('hidden');
+}
+function showPAPSStandard() {
+  document.getElementById('papsStandard').classList.remove('hidden');
+  document.getElementById('youthStandard').classList.add('hidden');
+}
+
+// PDF 저장
+function downloadPDF() {
+  html2pdf().from(document.body).set({
+    margin: 0.5,
+    filename: 'Result.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  }).save();
+}
+
+// 모바일/PC 레이아웃 전환
+function switchLayout(mode) {
+  const root = document.documentElement;
+  if (mode === 'mobile') {
+    root.style.setProperty('--max-width', '480px');
+    root.style.setProperty('--padding', '1rem');
+  } else {
+    root.style.setProperty('--max-width', '800px');
+    root.style.setProperty('--padding', '2rem');
+  }
+}
+
+// DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  const data = getParams();
+
+  if (data.name) {
+    setupBasicInfo(data);
+    createDetailCards(data.tests);
+    drawRadarChart(data.tests);
+  } else {
+    // 빈값 처리
+    setupBasicInfo({ name: '', gender: '', birth: '', measureDate: '', height: '', weight: '' });
+    createDetailCards([
+      { label: '유연성', t1: 0, t2: 0 },
+      { label: '근력', t1: 0, t2: 0 },
+      { label: '순발력', t1: 0, t2: 0 },
+      { label: '민첩성', t1: 0, t2: 0 },
+      { label: '평형성', t1: 0, t2: 0 },
+      { label: '협응성', t1: 0, t2: 0 }
+    ]);
+    drawRadarChart([
+      { label: '유연성', t1: 0, t2: 0 },
+      { label: '근력', t1: 0, t2: 0 },
+      { label: '순발력', t1: 0, t2: 0 },
+      { label: '민첩성', t1: 0, t2: 0 },
+      { label: '평형성', t1: 0, t2: 0 },
+      { label: '협응성', t1: 0, t2: 0 }
+    ]);
+  }
+
+  // 기본값 모바일로
+  switchLayout('mobile');
+});
+</script>
+<!-- 모바일/PC 레이아웃 토글 버튼 -->
+<div class="fixed top-4 right-4 flex space-x-2 z-50">
+  <button onclick="switchLayout('mobile')" class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm shadow">모바일 보기</button>
+  <button onclick="switchLayout('desktop')" class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm shadow">PC 보기</button>
+</div>
+
+<style>
+  /* 레이아웃 반응형 설정 */
+  :root {
+    --max-width: 480px;
+    --padding: 1rem;
+  }
+
+  body {
+    max-width: var(--max-width);
+    margin: auto;
+    padding: var(--padding);
+    background: #E0F2FE;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  .glass-card {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .title-gradient {
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    font-size: 1.875rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .score-bar {
+    position: relative;
+    width: 100%;
+    height: 2rem;
+    background: #f3f4f6;
+    border-radius: 9999px;
+    overflow: visible;
+    margin-top: 1.5rem;
+  }
+
+  .score-seg {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: white;
+  }
+
+  .threshold-label {
+    position: absolute;
+    top: -1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    transform: translateX(-50%);
+  }
+
+  .marker-line {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    width: 2px;
+    background: #1f1f1f;
+    transform: translateX(-50%);
+  }
+
+  .marker-arrow {
+    position: absolute;
+    bottom: -0.5rem;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #1f1f1f;
+    transform: translateX(-50%);
+  }
+
+  .marker-value {
+    position: absolute;
+    bottom: -2rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transform: translateX(-50%);
+    color: #1f1f1f;
+  }
+
+  /* 측정 방법 모달 스타일 */
+  #methodModal,
+  #referenceModal {
+    backdrop-filter: blur(4px);
+  }
+</style>
+
 </body>
 </html>
