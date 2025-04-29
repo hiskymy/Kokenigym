@@ -101,21 +101,22 @@
 </div><script>
 // URL 파라미터 읽기
 function getParams() {
+function getParams() {
   const params = new URLSearchParams(window.location.search);
   return {
-    name: params.get('name') || '',
-    gender: params.get('gender') || '',
-    birth: params.get('birth') || '',
-    height: parseFloat(params.get('height')) || 0,
-    weight: parseFloat(params.get('weight')) || 0,
-    measureDate: params.get('measureDate') || '',
+    name: params.get('name') ? decodeURIComponent(params.get('name')) : '',
+    gender: params.get('gender') ? decodeURIComponent(params.get('gender')) : '',
+    birth: params.get('birth') ? decodeURIComponent(params.get('birth')) : '',
+    measureDate: params.get('measureDate') ? decodeURIComponent(params.get('measureDate')) : '',
+    height: params.get('height') ? parseFloat(params.get('height')) : undefined,
+    weight: params.get('weight') ? parseFloat(params.get('weight')) : undefined,
     tests: [
-      { label: '유연성', t1: parseFloat(params.get('t01')) || 0, t2: parseFloat(params.get('t02')) || 0 },
-      { label: '근력', t1: parseFloat(params.get('t11')) || 0, t2: parseFloat(params.get('t12')) || 0 },
-      { label: '순발력', t1: parseFloat(params.get('t21')) || 0, t2: parseFloat(params.get('t22')) || 0 },
-      { label: '민첩성', t1: parseFloat(params.get('t31')) || 0, t2: parseFloat(params.get('t32')) || 0 },
-      { label: '평형성', t1: parseFloat(params.get('t41')) || 0, t2: parseFloat(params.get('t42')) || 0 },
-      { label: '협응성', t1: parseFloat(params.get('t51')) || 0, t2: parseFloat(params.get('t52')) || 0 }
+      { label: '유연성', t1: params.get('t01') ? parseFloat(params.get('t01')) : undefined, t2: params.get('t02') ? parseFloat(params.get('t02')) : undefined },
+      { label: '근력', t1: params.get('t11') ? parseFloat(params.get('t11')) : undefined, t2: params.get('t12') ? parseFloat(params.get('t12')) : undefined },
+      { label: '순발력', t1: params.get('t21') ? parseFloat(params.get('t21')) : undefined, t2: params.get('t22') ? parseFloat(params.get('t22')) : undefined },
+      { label: '민첩성', t1: params.get('t31') ? parseFloat(params.get('t31')) : undefined, t2: params.get('t32') ? parseFloat(params.get('t32')) : undefined },
+      { label: '평형성', t1: params.get('t41') ? parseFloat(params.get('t41')) : undefined, t2: params.get('t42') ? parseFloat(params.get('t42')) : undefined },
+      { label: '협응성', t1: params.get('t51') ? parseFloat(params.get('t51')) : undefined, t2: params.get('t52') ? parseFloat(params.get('t52')) : undefined }
     ]
   };
 }
