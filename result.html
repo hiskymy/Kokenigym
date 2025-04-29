@@ -7,10 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
   <style>
     body { font-family: 'Pretendard', sans-serif; background: #E0F2FE; padding: 1rem; }
-    .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); max-width: 600px; margin: auto; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; }
+    .glass-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); max-width: 700px; margin: auto; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 1rem; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; table-layout: fixed; }
     th, td { padding: 0.5rem; text-align: left; font-size: 0.875rem; word-break: keep-all; }
     th { background: #EFF6FF; color: #1E40AF; width: 40%; }
@@ -22,12 +23,9 @@
     .title-gradient { background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; color: transparent; }
   </style>
 </head>
-
 <body>
 
-<h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 결과지</h1>
-
-<div class="glass-card text-left">
+<h1 class="text-3xl font-extrabold text-center title-gradient mb-8">코크니짐 체력측정 결과지</h1><div class="glass-card text-left">
   <h2 class="text-lg font-bold text-indigo-700 mb-4">기본 정보</h2>
   <table>
     <tbody>
@@ -61,14 +59,11 @@
   <canvas id="radarChart" width="300" height="300"></canvas>
 </div>
 
-<div id="detailCards" class="space-y-6"></div>
-
-<script>
-// URL에서 formData 가져오기
+<div id="detailCards" class="space-y-6"></div><script>
+// URL에서 formData 읽기
 function getFormDataFromURL() {
   const params = new URLSearchParams(window.location.search);
   const data = {};
-
   for (const [key, value] of params.entries()) {
     data[key] = isNaN(value) ? value : parseFloat(value);
   }
@@ -77,32 +72,34 @@ function getFormDataFromURL() {
 
 const formData = getFormDataFromURL();
 
-function calculateAge(birth, measure) {
-  const birthDate = new Date(birth);
-  const measureDate = new Date(measure);
-  let age = measureDate.getFullYear() - birthDate.getFullYear();
-  const m = measureDate.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && measureDate.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age;
-}
-
+// 기본 정보 채우기
 function fillBasicInfo() {
-  document.getElementById("nameField").innerText = formData.name;
-  document.getElementById("genderField").innerText = formData.gender;
-  document.getElementById("birthField").innerText = formData.birth;
-  document.getElementById("measureDateField").innerText = formData.measureDate;
-  document.getElementById("ageDisplay").innerText = "(만 " + calculateAge(formData.birth, formData.measureDate) + "세)";
+  document.getElementById("nameField").innerText = formData.name || '-';
+  document.getElementById("genderField").innerText = formData.gender || '-';
+  document.getElementById("birthField").innerText = formData.birth || '-';
+  document.getElementById("measureDateField").innerText = formData.measureDate || '-';
+
+  if (formData.birth && formData.measureDate) {
+    const birthDate = new Date(formData.birth);
+    const measureDate = new Date(formData.measureDate);
+    let age = measureDate.getFullYear() - birthDate.getFullYear();
+    const m = measureDate.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && measureDate.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    document.getElementById("ageDisplay").innerText = `(만 ${age}세)`;
+  }
 }
 
+// 신체 정보 채우기
 function fillBodyInfo() {
-  document.getElementById("heightField").innerText = formData.height;
-  document.getElementById("weightField").innerText = formData.weight;
-  drawBMI();
+  document.getElementById("heightField").innerText = formData.height || '-';
+  document.getElementById("weightField").innerText = formData.weight || '-';
 }
 
+// BMI 계산 및 마커 이동
 function drawBMI() {
+  if (!formData.height || !formData.weight) return;
   const heightM = formData.height / 100;
   const bmi = (formData.weight / (heightM * heightM)).toFixed(1);
   let bmiPercent = 0;
@@ -118,6 +115,7 @@ function drawBMI() {
   document.getElementById("bmiMarkerValue").innerText = bmi;
 }
 
+// 레이더 차트 그리기
 function drawRadar() {
   const ctx = document.getElementById('radarChart').getContext('2d');
   new Chart(ctx, {
@@ -147,15 +145,56 @@ function drawRadar() {
     }
   });
 }
+</script><script>
+// 세부 평가 카드 자동 생성
+function fillDetailCards() {
+  const items = [
+    { label: '유연성', key: 't0', unit: 'cm', method: '좌전굴 (Sit and Reach Test)', description: '허리와 다리 뒤쪽 근육의 유연성을 평가하는 방법입니다.' },
+    { label: '근력', key: 't1', unit: '초', method: '윗몸 일으키기 (Sit-up Test)', description: '복근과 전신 근지구력을 평가하는 방법입니다.' },
+    { label: '순발력', key: 't2', unit: 'cm', method: '제자리멀리뛰기 (Standing Long Jump)', description: '짧은 시간에 최대 힘을 발휘하는 순발력을 평가합니다.' },
+    { label: '민첩성', key: 't3', unit: '초', method: '장애물 왕복달리기 (Shuttle Run)', description: '빠른 방향 전환과 민첩성을 평가합니다.' },
+    { label: '평형성', key: 't4', unit: '초', method: '한발서기 (One-leg Stand)', description: '신체 균형 능력을 평가합니다.' },
+    { label: '협응성', key: 't5', unit: '회', method: '공잡기 (Ball Catching)', description: '손과 눈의 협응 능력을 평가합니다.' }
+  ];
 
-// 시작할 때
+  const container = document.getElementById('detailCards');
+  container.innerHTML = '';
+
+  items.forEach((item, i) => {
+    const v1 = formData[`${item.key}1`] || '-';
+    const v2 = formData[`${item.key}2`] || '-';
+    
+    const card = document.createElement('div');
+    card.className = 'glass-card text-left';
+    card.innerHTML = `
+      <h2 class="text-lg font-bold text-indigo-700 mb-4">${item.label}</h2>
+      <table>
+        <tbody>
+          <tr><th>측정 방법</th><td>${item.method}</td></tr>
+          <tr><th>1회 측정값</th><td>${v1} ${item.unit}</td></tr>
+          <tr><th>2회 측정값</th><td>${v2} ${item.unit}</td></tr>
+        </tbody>
+      </table>
+      <p class="text-sm text-gray-700 mt-2">${item.description}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// 페이지 로드 시 자동 실행
 document.addEventListener("DOMContentLoaded", function() {
   fillBasicInfo();
   fillBodyInfo();
+  drawBMI();
   drawRadar();
-  // 세부 카드 생략 버전 (간단 출력만) 추가 가능
+  fillDetailCards();
 });
 </script>
-
+<div class="text-center text-xs text-gray-500 mt-10 mb-4">
+  상담문의 : 010-5380-5840<br>
+  <a href="https://linktr.ee/Kokenigym" target="_blank" class="underline text-blue-600">
+    코크니짐 Linktree 바로가기
+  </a>
+</div>
 </body>
 </html>
