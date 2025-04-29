@@ -577,11 +577,6 @@
     // (20) 문서가 로드된 후 실행
     document.addEventListener('DOMContentLoaded', () => {
       const data = getParams();
-      const wrapper = document.getElementById('wrapper');
-      if (!wrapper) {
-        console.error('wrapper 요소를 찾을 수 없습니다.');
-        return;
-      }
 
       if (data.name) {
         setupBasicInfo(data);
