@@ -130,7 +130,6 @@
       background-color: #3b82f6;
       color: white;
     }
-    <style>
   /* 데스크탑용 (A4 사이즈 유지) */
   @media (min-width: 1140px) {
     body {
@@ -419,41 +418,67 @@
 
     // (11-6) 레이더 차트 그리기
     function drawRadarChart(tests) {
-      const ctx = document.getElementById('radarChart').getContext('2d');
+  const ctx = document.getElementById('radarChart').getContext('2d');
 
-      const scores = tests.map(t => t.t1 || 0);
-      // 총점 계산
-      const totalScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-        // 등급 계산
-        let grade = '';
-        if (totalScore >= 90) grade = '1등급 (매우 우수)';
-        else if (totalScore >= 70) grade = '2등급 (우수)';
-        else if (totalScore >= 50) grade = '3등급 (보통)';
-        else if (totalScore >= 30) grade = '4등급 (미흡)';
-        else grade = '5등급 (매우 미흡)';
+  const scoreList = tests.map(t => {
+    const s1 = calculateScore(t.label, t.t1);
+    const s2 = calculateScore(t.label, t.t2);
+    return (s1 + s2) / (t.t1 && t.t2 ? 2 : 1);
+  });
 
-      const totalScoreDiv = document.getElementById('totalScore');
-        if (totalScoreDiv) {
-            totalScoreDiv.innerHTML = `
-            총점 <span class="text-3xl text-green-600">${totalScore}점</span> / ${grade}
-            `;
-        }
-      new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels: tests.map(t => t.label),
-          datasets: [
-            { label: '1회 측정', data: tests.map(t => calculateScore(t.label,t.t1)), fill: true, backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,1)' },
-            { label: '2회 측정', data: tests.map(t => calculateScore(t.label,t.t2)), fill: true, backgroundColor: 'rgba(16,185,129,0.2)', borderColor: 'rgba(16,185,129,1)' }
-          ]
+  const totalScore = Math.round(scoreList.reduce((a, b) => a + b, 0));
+  const averageScore = Math.round(totalScore / tests.length);
+
+  let grade = '';
+  if (averageScore >= 90) grade = '1등급 (매우 우수)';
+  else if (averageScore >= 70) grade = '2등급 (우수)';
+  else if (averageScore >= 50) grade = '3등급 (보통)';
+  else if (averageScore >= 30) grade = '4등급 (미흡)';
+  else grade = '5등급 (매우 미흡)';
+
+  const totalScoreDiv = document.getElementById('totalScore');
+  if (totalScoreDiv) {
+    totalScoreDiv.innerHTML = `
+      총점 <span class="text-3xl text-green-600">${totalScore}점</span> /
+      평균 <span class="text-xl text-indigo-700">${averageScore}점</span> -
+      <span class="text-lg font-semibold">${grade}</span>
+    `;
+  }
+
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: tests.map(t => t.label),
+      datasets: [
+        {
+          label: '1회 측정',
+          data: tests.map(t => calculateScore(t.label, t.t1)),
+          fill: true,
+          backgroundColor: 'rgba(59,130,246,0.2)',
+          borderColor: 'rgba(59,130,246,1)'
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: 'top' } },
-          scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks:{stepSize: 20}}  }
+        {
+          label: '2회 측정',
+          data: tests.map(t => calculateScore(t.label, t.t2)),
+          fill: true,
+          backgroundColor: 'rgba(16,185,129,0.2)',
+          borderColor: 'rgba(16,185,129,1)'
         }
-      });
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        r: {
+          suggestedMin: 0,
+          suggestedMax: 100,
+          ticks: { stepSize: 20 }
+        }
+      }
     }
+  });
+}
 
     // (11-7) 등급별 멘트 데이터
     const gradeComments = {
