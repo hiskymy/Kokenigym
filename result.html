@@ -657,7 +657,7 @@
 
         const card = document.createElement('div');
         card.className = 'glass-card text-left';
-        card.innerHTML = `${tip ? `<div id="feedback-${i}" class="tooltip">💡 ${tip}</div>` : ''}
+        card.innerHTML = `
          <div class="flex justify-between items-center mb-2 relative cursor-pointer" onclick="toggleFeedback(${i})">
   <h2 class="text-md font-bold text-indigo-700">${lbl}</h2>
   <div class="text-sm font-semibold ${gradeColor} text-white px-3 py-1 rounded-full relative">
@@ -683,6 +683,7 @@
           <div class="mt-3">
             <p id="comment-${i}" class="text-xs text-gray-700 leading-relaxed cursor-pointer hover:underline" onclick="editComment(${i}, '${lbl}')">${cm}</p>            
           </div>
+          ${tip ? `<div id="feedback-${i}" class="tooltip" onclick="this.classList.remove('tootip-visible')">💡 ${tip}</div>` : ''}
         `;
         c.appendChild(card);
       });
