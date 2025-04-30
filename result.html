@@ -657,7 +657,6 @@
         card.innerHTML = `${tip ? `<div id="feedback-${i}" class="tooltip">💡 ${tip}</div>` : ''}
          <div class="flex justify-between items-center mb-2 relative cursor-pointer" onclick="toggleFeedback(${i})">
   <h2 class="text-md font-bold text-indigo-700">${lbl}</h2>
-  <div class="feedback-container">
   <div class="text-sm font-semibold ${gradeColor} text-white px-3 py-1 rounded-full relative">
     ${gradeText}
     ${grd >= 2 ? `<span id="dot-${i}" class="feedback-indicator"></span>` : ''}
