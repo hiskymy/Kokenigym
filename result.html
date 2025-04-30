@@ -160,7 +160,7 @@
       border-radius: 1rem;
     }
   }
-    .feedback-container {
+.feedback-container {
   position: relative;
   display: inline-block;
 }
@@ -654,12 +654,13 @@
 
         const card = document.createElement('div');
         card.className = 'glass-card text-left';
-        card.innerHTML = `${tip ? `<div id="feedback-${i}" class="hidden text-xs bg-teal-100 border border-teal-400 rounded-lg p-2 mt-1 text-gray-800 shadow w-fit max-w-xs">💡 ${tip}</div>` : ''}
+        card.innerHTML = `${tip ? `<div id="feedback-${i}" class="tooltip">💡 ${tip}</div>` : ''}
          <div class="flex justify-between items-center mb-2 relative cursor-pointer" onclick="toggleFeedback(${i})">
   <h2 class="text-md font-bold text-indigo-700">${lbl}</h2>
+  <div class="feedback-container">
   <div class="text-sm font-semibold ${gradeColor} text-white px-3 py-1 rounded-full relative">
     ${gradeText}
-    ${grd >= 2 ? `<span id="dot-${i}" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>` : ''}
+    ${grd >= 2 ? `<span id="dot-${i}" class="feedback-indicator"></span>` : ''}
   </div>
 </div>
           <div class="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
@@ -840,8 +841,8 @@
   const box = document.getElementById(`feedback-${i}`);
   const dot = document.getElementById(`dot-${i}`);
   if (box) {
-    const isShown = !box.classList.contains('hidden');
-    box.classList.toggle('hidden');
+    const isShown = !box.classList.contains('tooltip-visible');
+    box.classList.toggle('tooltip-visible');
     if (!isShown && dot) dot.remove(); // 말풍선 처음 열릴 때 점 제거
   }
   }
