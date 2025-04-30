@@ -160,6 +160,58 @@
       border-radius: 1rem;
     }
   }
+    .feedback-container {
+  position: relative;
+  display: inline-block;
+}
+.feedback-indicator {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 9999px;
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.tooltip {
+  position: absolute;
+  top: -70px;
+  left: 0;
+  padding: 0.5rem 1rem;
+  background-color: #99f6e4;
+  color: #065f46;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 1rem;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #99f6e4 transparent transparent transparent;
+}
+.tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
   </style>
 </head>
 <body>
@@ -540,7 +592,45 @@
       c.innerHTML = '';
       tests.forEach((t, i) => {
         const m = methods[i], lbl = t.label, grd = (t.t1 !== undefined) ? getGrade(t.t1, lbl) : 3;
-        const cm = gradeComments[lbl][grd];        
+        const cm = gradeComments[lbl][grd];
+        const feedbackTips = {
+  유연성: {
+    A: "동물 흉내 스트레칭 놀이를 해봐요! 예: 고양이 자세, 뱀처럼 기어가기",
+    B: "줄넘기 전에 스트레칭 루틴을 만들고 따라해보세요!",
+    C: "햄스트링, 허리 유연성 늘리는 요가 동작을 해보세요 (예: 다운독, 전굴)"
+  },
+  근력: {
+    A: "벽 밀기, 짐볼 위에 앉아 균형잡기 놀이를 해보세요!",
+    B: "스쿼트 5회씩 게임처럼 도전해보세요! 횟수 늘리기 목표 추천!",
+    C: "플랭크, 푸쉬업 등 맨몸 근력운동을 주기적으로 해보세요."
+  },
+  순발력: {
+    A: "줄 위로 점프 놀이, 색깔표 위 점프게임을 해보세요!",
+    B: "제자리 멀리뛰기 목표를 정하고 기록깨기 게임을 해보세요!",
+    C: "반응속도 게임(짝짝이, 불빛 반응)을 활용한 순발력 훈련을 해보세요."
+  },
+  민첩성: {
+    A: "콘 장애물 넘기 게임으로 방향 바꾸기 연습해요!",
+    B: "지그재그 달리기 게임, 무작위 명령 반응 게임을 해보세요.",
+    C: "셔틀 런 훈련이나 사이드 스텝 훈련을 추천해요."
+  },
+  평형성: {
+    A: "한 발로 오래 서기 놀이를 해보세요! 인형 옮기기 미션도 재미있어요!",
+    B: "균형보드, 쿠션 위에서 한발로 서보기 챌린지!",
+    C: "자세 유지 훈련 (예: 워리어 포즈, 요가 나무자세)로 균형감각을 키우세요."
+  },
+  협응성: {
+    A: "색깔공 던지기-받기 놀이! 손발 동시 사용 놀이로 협응력 키워요.",
+    B: "리듬 타며 탬버린 두드리기, 탁구 등 공놀이 추천!",
+    C: "양손 독립 움직임 게임(드럼, 타자 연습 등)을 활용해보세요."
+  }
+};
+
+// 연령 분류 및 피드백 삽입 조건
+const age = data.birth && data.measureDate ? calculateAge(data.birth, data.measureDate).match(/\d+/)?.[0] : null;
+const group = age ? getAgeGroup(parseInt(age)) : null;
+const tip = (grd >= 2 && group && feedbackTips[lbl] && feedbackTips[lbl][group]) ? feedbackTips[lbl][group] : null;
+        
 
         const age = userAge; // 사용자 나이 (미리 계산해서 세팅한 값)
         const criteriaValue = firstGradeCriteria[lbl] ? firstGradeCriteria[lbl][age] : null;
@@ -565,10 +655,13 @@
         const card = document.createElement('div');
         card.className = 'glass-card text-left';
         card.innerHTML = `
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="text-md font-bold text-indigo-700">${lbl}</h2>
-            <div class="text-sm font-semibold ${gradeColor} text-white px-3 py-1 rounded-full">${gradeText}</div>
-          </div>
+         <div class="flex justify-between items-center mb-2 relative cursor-pointer" onclick="toggleFeedback(${i})">
+  <h2 class="text-md font-bold text-indigo-700">${lbl}</h2>
+  <div class="text-sm font-semibold ${gradeColor} text-white px-3 py-1 rounded-full relative">
+    ${gradeText}
+    ${grd >= 2 ? `<span id="dot-${i}" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>` : ''}
+  </div>
+</div>
           <div class="relative w-full h-6 bg-gray-200 rounded-full overflow-hidden">
             <div class="absolute top-0 left-0 h-full bg-indigo-400" style="width:${score}%;"></div>
             <div class="absolute w-full text-center text-xs font-bold leading-6">${score}점</div>
@@ -586,6 +679,7 @@
           </table>
           <div class="mt-3">
             <p id="comment-${i}" class="text-xs text-gray-700 leading-relaxed cursor-pointer hover:underline" onclick="editComment(${i}, '${lbl}')">${cm}</p>
+            ${tip ? `<div id="feedback-${i}" class="hidden text-xs bg-teal-100 border border-teal-400 rounded-lg p-2 mt-1 text-gray-800 shadow w-fit max-w-xs">💡 ${tip}</div>` : ''}
           </div>
         `;
         c.appendChild(card);
@@ -737,7 +831,21 @@
         `;
         }
     }
-  
+    function getAgeGroup(age) {
+  if (age >= 5 && age <= 8) return 'A';
+  if (age >= 9 && age <= 12) return 'B';
+  if (age >= 13 && age <= 18) return 'C';
+  return null; // 미지원 연령
+    }
+  function toggleFeedback(i) {
+  const box = document.getElementById(`feedback-${i}`);
+  const dot = document.getElementById(`dot-${i}`);
+  if (box) {
+    const isShown = !box.classList.contains('hidden');
+    box.classList.toggle('hidden');
+    if (!isShown && dot) dot.remove(); // 말풍선 처음 열릴 때 점 제거
+  }
+  }
 
     let userAge = 0; // 사용자 나이 초기화
 
