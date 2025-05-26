@@ -367,18 +367,13 @@
     }
 
     // (11-3) 나이 계산
-    /*function calculateAge(b, m) {
+    function calculateAge(b, m) {
     /=  if (!b || !m) return '';
       const bd = new Date(b), md = new Date(m);
-      let age = md.getFullYear() - bd.getFullYear();
-      const mm = md.getMonth() - bd.getMonth();
-      if (mm < 0 || (mm === 0 && md.getDate() < bd.getDate())) age--;
+      let age = md.getFullYear() - bd.getFullYear()+1;
+      //const mm = md.getMonth() - bd.getMonth();
+      //if (mm < 0 || (mm === 0 && md.getDate() < bd.getDate())) age--;
       return age;
-    }*/
-    function calculateAge(birthDateStr) {
-        const birthYear = new Date(birthDateStr).getFullYear();
-        const currentYear = new Date().getFullYear();
-        return currentYear - birthYear + 1;
     }
     // (11-4) BMI 좌표 계산
     function bmiToPosition(bmi) {
@@ -392,7 +387,7 @@
     function setupBasicInfo(d) {
       document.getElementById('nameCell').innerText = safe(d.name);
       document.getElementById('genderCell').innerText = safe(d.gender);
-      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.birth)}` : '');
+      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.measureDate,d.birth)}` : '');
       document.getElementById('measureDateCell').innerText = safe(d.measureDate);
       document.getElementById('heightCell').innerText = safe(d.height);
       document.getElementById('weightCell').innerText = safe(d.weight);
@@ -886,11 +881,11 @@
     function calculateAge(birth, measureDate) {
         const birthDate = new Date(birth);
         const measure = new Date(measureDate);
-        let age = measure.getFullYear() - birthDate.getFullYear();
+        let age = measure.getFullYear() - birthDate.getFullYear()+1;
         const m = measure.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && measure.getDate() < birthDate.getDate())) {
-            age--;
-         }
+       // if (m < 0 || (m === 0 && measure.getDate() < birthDate.getDate())) {
+       //     age--;
+       //  }
         userAge = age; // 나이를 계산한 후 userAge에 저장
 
         return `(만 ${age}세)`; // 나이 리턴
