@@ -327,8 +327,8 @@
     <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl shadow-lg">
       <h3 class="text-lg font-bold mb-6 text-center text-indigo-700">참고 기준표</h3>
       <div class="flex justify-center mb-6 space-x-2">
-        <button onclick="showYouthStandard()" class="tab-button active-tab">5~11세(코크니짐)</button>
-        <button onclick="showPAPSStandard()" class="tab-button">12세 이상(PAPS)</button>
+        <!--<button onclick="showYouthStandard()" class="tab-button active-tab">5~11세(코크니짐)</button>-->
+        <!--<button onclick="showPAPSStandard()" class="tab-button">12세 이상(PAPS)</button>-->
       </div>
       <div id="youthStandard" class="overflow-x-auto mb-4"></div>
       <div id="papsStandard" class="hidden overflow-x-auto mb-4"></div>
@@ -845,7 +845,7 @@
         //age--;
         //}
     
-        const data = averageData[gender === '남성' ? 'male' : 'female'][age];
+        const data = averageData[gender === '남아' ? 'male' : 'female'][age];
     
         if (data) {
         infoDiv.innerHTML = `
