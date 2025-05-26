@@ -600,7 +600,7 @@
     function calculateScore(label,value){
         if (value === undefined || value === null || isNaN(value))return 0;
         const age = userAge;
-        const standard = firstGradeCriteria[label] ? firstGradeCriteria[label][age] : null;
+        const standard = firstGradeCriteria[label] ? firstGradeCriteria[label][age+2] : null;
         let score = 0;
         if (value !== undefined && value !== null){       
             if (label === '민첩성') {
