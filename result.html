@@ -367,13 +367,18 @@
     }
 
     // (11-3) 나이 계산
-    function calculateAge(b, m) {
-      if (!b || !m) return '';
+    /*function calculateAge(b, m) {
+    /=  if (!b || !m) return '';
       const bd = new Date(b), md = new Date(m);
       let age = md.getFullYear() - bd.getFullYear();
       const mm = md.getMonth() - bd.getMonth();
       if (mm < 0 || (mm === 0 && md.getDate() < bd.getDate())) age--;
       return age;
+    }*/
+    function calculateAge(birthDateStr) {
+  const birthYear = new Date(birthDateStr).getFullYear();
+  const currentYear = new Date().getFullYear();
+  return currentYear - birthYear + 1;
     }
     // (11-4) BMI 좌표 계산
     function bmiToPosition(bmi) {
@@ -387,7 +392,7 @@
     function setupBasicInfo(d) {
       document.getElementById('nameCell').innerText = safe(d.name);
       document.getElementById('genderCell').innerText = safe(d.gender);
-      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.birth, d.measureDate)}` : '');
+      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.birth)}` : '');
       document.getElementById('measureDateCell').innerText = safe(d.measureDate);
       document.getElementById('heightCell').innerText = safe(d.height);
       document.getElementById('weightCell').innerText = safe(d.weight);
@@ -600,7 +605,7 @@
     function calculateScore(label,value){
         if (value === undefined || value === null || isNaN(value))return 0;
         const age = userAge;
-        const standard = firstGradeCriteria[label] ? firstGradeCriteria[label][age+2] : null;
+        const standard = firstGradeCriteria[label] ? firstGradeCriteria[label][age] : null;
         let score = 0;
         if (value !== undefined && value !== null){       
             if (label === '민첩성') {
