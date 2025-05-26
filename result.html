@@ -365,7 +365,6 @@
         ]
       };
     }
-
     // (11-3) 나이 계산
     function calculateAge(b, m) {
     /=  if (!b || !m) return '';
@@ -387,7 +386,7 @@
     function setupBasicInfo(d) {
       document.getElementById('nameCell').innerText = safe(d.name);
       document.getElementById('genderCell').innerText = safe(d.gender);
-      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.measureDate,d.birth)}` : '');
+      document.getElementById('birthCell').innerText = safe(d.birth) + (d.birth && d.measureDate ? ` ${calculateAge(d.birth, d.measureDate)}` : '');
       document.getElementById('measureDateCell').innerText = safe(d.measureDate);
       document.getElementById('heightCell').innerText = safe(d.height);
       document.getElementById('weightCell').innerText = safe(d.weight);
@@ -839,11 +838,11 @@
         // 나이 계산
         const birth = new Date(birthYear);
         const measure = new Date(measureDate);
-        let age = measure.getFullYear() - birth.getFullYear();
-        const m = measure.getMonth() - birth.getMonth();
-        if (m < 0 || (m === 0 && measure.getDate() < birth.getDate())) {
-        age--;
-        }
+        let age = measure.getFullYear() - birth.getFullYear() + 1;
+        //const m = measure.getMonth() - birth.getMonth();
+        //if (m < 0 || (m === 0 && measure.getDate() < birth.getDate())) {
+        //age--;
+        //}
     
         const data = averageData[gender === '남성' ? 'male' : 'female'][age];
     
@@ -881,8 +880,8 @@
     function calculateAge(birth, measureDate) {
         const birthDate = new Date(birth);
         const measure = new Date(measureDate);
-        let age = measure.getFullYear() - birthDate.getFullYear()+1;
-        const m = measure.getMonth() - birthDate.getMonth();
+        let age = measure.getFullYear() - birthDate.getFullYear() + 1;
+       //const m = measure.getMonth() - birthDate.getMonth();
        // if (m < 0 || (m === 0 && measure.getDate() < birthDate.getDate())) {
        //     age--;
        //  }
