@@ -376,9 +376,9 @@
       return age;
     }*/
     function calculateAge(birthDateStr) {
-  const birthYear = new Date(birthDateStr).getFullYear();
-  const currentYear = new Date().getFullYear();
-  return currentYear - birthYear + 1;
+        const birthYear = new Date(birthDateStr).getFullYear();
+        const currentYear = new Date().getFullYear();
+        return currentYear - birthYear + 1;
     }
     // (11-4) BMI 좌표 계산
     function bmiToPosition(bmi) {
@@ -413,7 +413,7 @@
     
         const birthYear = new Date(d.birth).getFullYear();
         const measureYear = new Date(d.measureDate).getFullYear();
-        let age = measureYear - birthYear;
+        let age = measureYear - birthYear + 1;
 
         displayAverage(heightCell, weightCell, d.gender, d.birth, d.measureDate)
 
